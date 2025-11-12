@@ -1,0 +1,68 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}View History - EcoRate{% endblock %}
+
+{% block content %}
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'user_history' %}" class="nav-link active">History</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 1400px;">
+  <div class="card-header">
+    <h2>Your Viewing History</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Recently viewed sustainable products</p>
+  </div>
+
+  <div class="card-body">
+    {% if history %}
+      <div class="mb-4">
+        <p style="color: var(--neutral-600);">Showing your last {{ history|length }} viewed products</p>
+      </div>
+      
+      <div style="display: grid; gap: 1rem;">
+        {% for item in history %}
+        <div class="dashboard-card" style="display: flex; gap: 1rem; align-items: center; text-align: left;">
+          <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+          <div style="flex: 1;">
+            <h4 style="margin-bottom: 0.5rem;">{{ item.product.name }}</h4>
+            <p style="color: var(--neutral-600); margin-bottom: 0.5rem;">{{ item.product.brand }} - ${{ item.product.price }}</p>
+            <div class="sustainability-score" style="display: inline-block; margin-bottom: 0.5rem;">
+              🌱 Eco Score: {{ item.product.sustainability_score }}/10
+            </div>
+            <p style="font-size: 0.875rem; color: var(--neutral-500); margin: 0;">
+              Viewed on {{ item.viewed_at|date:"M d, Y g:i A" }}
+            </p>
+          </div>
+          <div>
+            <a href="{% url 'product_detail' item.product.id %}" class="btn-primary" style="text-decoration: none; font-size: 0.875rem;">View Again</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="dashboard-card text-center">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+        <h3 style="margin-bottom: 1rem;">No History Yet</h3>
+        <p style="color: var(--neutral-600); margin-bottom: 2rem;">Start browsing products to build your viewing history!</p>
+        <a href="{% url 'product_list' %}" class="btn-primary" style="text-decoration: none;">Browse Products</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

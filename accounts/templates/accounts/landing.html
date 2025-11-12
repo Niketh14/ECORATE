@@ -4,16 +4,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website System - Home</title>
+    <title>EcoRate - Sustainable Product Reviews</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌱%3C/text%3E%3C/svg%3E">
+    
     <link rel="stylesheet" href="{% static 'accounts/style.css' %}">
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Website System</h1>
-        <p>Explore products, connect with sellers, or manage your listings — all in one place.</p>
-
-        <a href="{% url 'login' %}" class="button">Login</a>
-        <a href="{% url 'register' %}" class="button">Register</a>
+        <div style="margin-bottom: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🌱</div>
+            <h1>Welcome to EcoRate</h1>
+            <p style="font-size: 1.25rem; color: var(--neutral-600); margin-bottom: 2rem;">Discover, review, and rate sustainable products that make a difference for our planet.</p>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'login' %}" class="button">Sign In</a>
+            <a href="{% url 'register' %}" class="btn-secondary" style="text-decoration: none;">Create Account</a>
+        </div>
+        
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200);">
+            <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Why Choose EcoRate?</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: left;">
+                <div>
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🌍</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Eco-Friendly Focus</h4>
+                    <p style="font-size: 0.9rem; margin: 0;">Find products that prioritize sustainability and environmental responsibility.</p>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⭐</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Trusted Reviews</h4>
+                    <p style="font-size: 0.9rem; margin: 0;">Read authentic reviews from verified users who care about sustainability.</p>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Impact Tracking</h4>
+                    <p style="font-size: 0.9rem; margin: 0;">Track your environmental impact through sustainable purchasing decisions.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

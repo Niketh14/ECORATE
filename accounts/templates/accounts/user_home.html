@@ -1,0 +1,106 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link active">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+    </div>
+  </div>
+</nav>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Welcome back, {{ user.username }}!</h2>
+    <img class="avatar" src="{{ user.profile_pic.url }}" alt="{{ user.username }}'s Profile Picture">
+  </div>
+
+  <div class="card-body">
+    <div class="text-center mb-8">
+      <h3 style="color: var(--neutral-800); margin-bottom: 0.5rem;">Your Sustainability Dashboard</h3>
+      <p style="color: var(--neutral-600); font-size: 1.125rem;">Track your eco-friendly journey and discover sustainable products</p>
+    </div>
+
+    <div class="form-grid">
+      <div class="dashboard-card">
+        <h4>📊 Your Impact</h4>
+        <div style="margin: 1rem 0;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Reviews Written:</span>
+            <strong style="color: var(--primary-color);">{{ reviews_count }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Products Viewed:</span>
+            <strong style="color: var(--secondary-color);">{{ products_viewed }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Favorites:</span>
+            <strong style="color: var(--accent-color);">{{ favorites_count }}</strong>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>🌱 Sustainability Focus</h4>
+        <p style="margin: 1rem 0;">{{ user.sustainability_interests|default:"Set your sustainability interests in your profile to get personalized recommendations." }}</p>
+        <a href="{% url 'user_profile' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem; text-decoration: none;">Update Interests</a>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>📍 Your Location</h4>
+        <p style="margin: 1rem 0;">{{ user.location|default:"Add your location to find local sustainable products and services." }}</p>
+        {% if not user.location %}
+        <a href="{% url 'user_profile' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem; text-decoration: none;">Add Location</a>
+        {% endif %}
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>🕰️ Member Since</h4>
+        <p style="margin: 1rem 0; font-size: 1.125rem; font-weight: 600; color: var(--primary-color);">{{ user.date_joined|date:"F Y" }}</p>
+        <p style="margin: 0; font-size: 0.875rem; color: var(--neutral-500);">Thank you for being part of our sustainable community!</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200);">
+      <h3 style="text-align: center; color: var(--neutral-800); margin-bottom: 2rem;">Quick Actions</h3>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'product_list' %}" class="btn-primary" style="text-decoration: none;">
+          🔍 Explore Products
+        </a>
+        <a href="{% url 'favorites' %}" class="btn-secondary" style="text-decoration: none;">
+          ❤️ My Favorites
+        </a>
+        <a href="{% url 'user_history' %}" class="btn-secondary" style="text-decoration: none;">
+          📅 View History
+        </a>
+        <a href="{% url 'user_profile' %}" class="btn-secondary" style="text-decoration: none;">
+          ⚙️ Edit Profile
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200);">
+      <h3 style="text-align: center; color: var(--neutral-800); margin-bottom: 2rem;">Recent Activity</h3>
+      <div class="dashboard-card" style="text-align: center;">
+        <p style="color: var(--neutral-500); font-style: italic;">No recent activity yet. Start exploring sustainable products to see your activity here!</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

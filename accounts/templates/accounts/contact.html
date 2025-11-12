@@ -1,0 +1,109 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Contact Us - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link active">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      {% if user.is_authenticated %}
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="max-width: 800px;">
+  <div class="card-header">
+    <div style="font-size: 2rem; margin-bottom: 1rem;">📧</div>
+    <h2>Contact Us</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Get in touch with the EcoRate team</p>
+  </div>
+
+  <div class="card-body">
+    <div class="form-grid mb-8">
+      <div class="dashboard-card">
+        <h4>📍 Address</h4>
+        <p>123 Green Street<br>Eco City, EC 12345<br>United States</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>📞 Phone</h4>
+        <p>+1 (555) 123-4567<br>Mon-Fri: 9AM-6PM EST</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>✉️ Email</h4>
+        <p>support@ecorate.com<br>partnerships@ecorate.com</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>🕒 Response Time</h4>
+        <p>We typically respond within 24 hours during business days.</p>
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+      <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Send us a Message</h3>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+          <div>
+            <label class="form-label" for="name">Your Name</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+          </div>
+          
+          <div>
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <label class="form-label" for="subject">Subject</label>
+          <select id="subject" name="subject" class="form-select" required>
+            <option value="">Select a topic</option>
+            <option value="general">General Inquiry</option>
+            <option value="support">Technical Support</option>
+            <option value="partnership">Partnership Opportunity</option>
+            <option value="feedback">Feedback & Suggestions</option>
+            <option value="report">Report an Issue</option>
+          </select>
+        </div>
+        
+        <div class="mb-6">
+          <label class="form-label" for="message">Message</label>
+          <textarea id="message" name="message" class="form-control" rows="6" placeholder="Tell us how we can help you..." required></textarea>
+        </div>
+        
+        <div class="text-center">
+          <button type="submit" class="btn-primary">Send Message</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="mt-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">Frequently Asked Questions</h3>
+      <div class="text-center">
+        <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">
+          Check our FAQ section for quick answers to common questions.
+        </p>
+        <a href="{% url 'faq' %}" class="btn-secondary" style="text-decoration: none;">View FAQ</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

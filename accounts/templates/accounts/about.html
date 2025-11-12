@@ -1,0 +1,101 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}About Us - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link active">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      {% if user.is_authenticated %}
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="max-width: 1000px;">
+  <div class="card-header">
+    <div style="font-size: 2rem; margin-bottom: 1rem;">🌱</div>
+    <h2>About EcoRate</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Empowering sustainable choices through community reviews</p>
+  </div>
+
+  <div class="card-body">
+    <div class="mb-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Our Mission</h3>
+      <p style="font-size: 1.125rem; line-height: 1.7; color: var(--neutral-700);">
+        EcoRate is dedicated to making sustainable living accessible and informed. We believe that every purchase decision can contribute to a healthier planet, and our platform empowers consumers to make eco-conscious choices through authentic community reviews and comprehensive sustainability metrics.
+      </p>
+    </div>
+
+    <div class="form-grid mb-8">
+      <div class="dashboard-card">
+        <h4>🌍 Environmental Impact</h4>
+        <p>We help reduce environmental footprint by promoting sustainable products and practices through our community-driven platform.</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>👥 Community Driven</h4>
+        <p>Our reviews come from real users who care about sustainability, ensuring authentic and trustworthy product evaluations.</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>📊 Data Transparency</h4>
+        <p>We provide clear sustainability metrics and certifications to help you make informed purchasing decisions.</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>🚀 Innovation</h4>
+        <p>Continuously improving our platform to better serve the growing community of environmentally conscious consumers.</p>
+      </div>
+    </div>
+
+    <div class="mb-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Our Team</h3>
+      <div class="dashboard-card">
+        <p style="color: var(--neutral-700); line-height: 1.6;">
+          EcoRate was founded by a team of environmental enthusiasts and technology experts who recognized the need for a trusted platform to evaluate sustainable products. Our diverse team combines expertise in environmental science, user experience design, and community building to create a platform that truly serves the needs of eco-conscious consumers.
+        </p>
+      </div>
+    </div>
+
+    <div class="mb-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Sustainability Standards</h3>
+      <div class="dashboard-card">
+        <h4 style="margin-bottom: 1rem;">Our Evaluation Criteria</h4>
+        <ul style="color: var(--neutral-700); line-height: 1.6;">
+          <li><strong>Materials:</strong> Renewable, recycled, or biodegradable materials</li>
+          <li><strong>Manufacturing:</strong> Energy-efficient and low-impact production processes</li>
+          <li><strong>Packaging:</strong> Minimal, recyclable, or compostable packaging</li>
+          <li><strong>Durability:</strong> Long-lasting products that reduce replacement needs</li>
+          <li><strong>End-of-life:</strong> Recyclable, repairable, or biodegradable disposal options</li>
+          <li><strong>Certifications:</strong> Third-party environmental certifications and standards</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Join Our Mission</h3>
+      <p style="color: var(--neutral-600); margin-bottom: 2rem;">
+        Together, we can build a more sustainable future through informed consumer choices.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'register' %}" class="btn-primary" style="text-decoration: none;">Join EcoRate</a>
+        <a href="{% url 'contact' %}" class="btn-secondary" style="text-decoration: none;">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

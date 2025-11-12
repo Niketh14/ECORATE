@@ -1,0 +1,116 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}FAQ - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link active">FAQ</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      {% if user.is_authenticated %}
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="max-width: 1000px;">
+  <div class="card-header">
+    <div style="font-size: 2rem; margin-bottom: 1rem;">❓</div>
+    <h2>Frequently Asked Questions</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Find answers to common questions about EcoRate</p>
+  </div>
+
+  <div class="card-body">
+    <div class="mb-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 2rem;">General Questions</h3>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">What is EcoRate?</h4>
+        <p style="color: var(--neutral-700);">EcoRate is a community-driven platform that helps consumers discover and review sustainable, eco-friendly products. We provide detailed sustainability metrics and authentic user reviews to help you make informed purchasing decisions that benefit the environment.</p>
+      </div>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">How do you determine sustainability scores?</h4>
+        <p style="color: var(--neutral-700);">Our sustainability scores are based on multiple factors including materials used, manufacturing processes, packaging, durability, end-of-life disposal options, and third-party certifications. Each product is evaluated on a scale of 1-10, with 10 being the most sustainable.</p>
+      </div>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">Is EcoRate free to use?</h4>
+        <p style="color: var(--neutral-700);">Yes! EcoRate is completely free for consumers. You can browse products, read reviews, and write your own reviews without any cost. We believe sustainable information should be accessible to everyone.</p>
+      </div>
+    </div>
+
+    <div class="mb-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 2rem;">Account & Reviews</h3>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">Do I need an account to browse products?</h4>
+        <p style="color: var(--neutral-700);">You can browse our product catalog without an account, but you'll need to register to write reviews, save favorites, and access personalized features like your viewing history and sustainability impact tracking.</p>
+      </div>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">Can I edit or delete my reviews?</h4>
+        <p style="color: var(--neutral-700);">Yes, you can edit or delete your reviews at any time from your profile dashboard. We encourage honest, updated reviews as your experience with products may change over time.</p>
+      </div>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">How do you ensure review authenticity?</h4>
+        <p style="color: var(--neutral-700);">We have several measures in place including user verification, review moderation, and community reporting. Users can only submit one review per product, and we actively monitor for suspicious activity.</p>
+      </div>
+    </div>
+
+    <div class="mb-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 2rem;">Products & Shopping</h3>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">Do you sell products directly?</h4>
+        <p style="color: var(--neutral-700);">No, EcoRate is a review and information platform. We don't sell products directly, but we provide links to trusted retailers where you can purchase the products you're interested in.</p>
+      </div>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">How can I suggest a product to be added?</h4>
+        <p style="color: var(--neutral-700);">We welcome product suggestions! You can contact us through our contact form with details about the sustainable product you'd like to see reviewed on our platform.</p>
+      </div>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">What types of products do you feature?</h4>
+        <p style="color: var(--neutral-700);">We feature a wide range of eco-friendly products including electronics, home goods, fashion, personal care, food items, and more. Our focus is on products that have sustainable materials, ethical manufacturing, or positive environmental impact.</p>
+      </div>
+    </div>
+
+    <div class="mb-8">
+      <h3 style="color: var(--primary-color); margin-bottom: 2rem;">For Businesses</h3>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">How can my business get listed on EcoRate?</h4>
+        <p style="color: var(--neutral-700);">Businesses can apply to have their sustainable products featured on EcoRate. Contact us through our partnership email with information about your products and sustainability practices.</p>
+      </div>
+      
+      <div class="dashboard-card mb-4">
+        <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">Do you offer business accounts?</h4>
+        <p style="color: var(--neutral-700);">Yes, we offer seller accounts for businesses that want to manage their product listings and respond to customer reviews. Contact us for more information about business account features.</p>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Still Have Questions?</h3>
+      <p style="color: var(--neutral-600); margin-bottom: 2rem;">
+        Can't find what you're looking for? We're here to help!
+      </p>
+      <a href="{% url 'contact' %}" class="btn-primary" style="text-decoration: none;">Contact Support</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

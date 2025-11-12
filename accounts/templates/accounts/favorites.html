@@ -1,0 +1,80 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}My Favorites - EcoRate{% endblock %}
+
+{% block content %}
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'favorites' %}" class="nav-link active">Favorites</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 1400px;">
+  <div class="card-header">
+    <h2>My Favorite Products</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Your saved sustainable products</p>
+  </div>
+
+  <div class="card-body">
+    {% if favorites %}
+      <div class="product-grid">
+        {% for favorite in favorites %}
+        <div class="product-card">
+          <img src="{{ favorite.product.image.url }}" alt="{{ favorite.product.name }}" class="product-image">
+          <div class="product-info">
+            <h4 class="product-title">{{ favorite.product.name }}</h4>
+            <p class="brand">{{ favorite.product.brand }}</p>
+            <p class="price">${{ favorite.product.price }}</p>
+            <div class="sustainability-score">
+              🌱 Eco Score: {{ favorite.product.sustainability_score }}/10
+            </div>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+              <a href="{% url 'product_detail' favorite.product.id %}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.875rem; padding: 0.5rem;">View Details</a>
+              <button onclick="removeFavorite({{ favorite.product.id }})" class="btn-secondary" style="padding: 0.5rem; font-size: 0.875rem;">Remove</button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="dashboard-card text-center">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">💚</div>
+        <h3 style="margin-bottom: 1rem;">No Favorites Yet</h3>
+        <p style="color: var(--neutral-600); margin-bottom: 2rem;">Start adding products to your favorites to see them here!</p>
+        <a href="{% url 'product_list' %}" class="btn-primary" style="text-decoration: none;">Browse Products</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% csrf_token %}
+<script>
+function removeFavorite(productId) {
+  fetch(`/toggle-favorite/${productId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    location.reload();
+  });
+}
+</script>
+{% endblock %}

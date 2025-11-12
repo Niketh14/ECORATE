@@ -1,0 +1,124 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'admin_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate Admin
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'admin_home' %}" class="nav-link active">Dashboard</a>
+      <a href="/admin/" class="nav-link">Django Admin</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Admin Dashboard</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">System overview and management</p>
+  </div>
+
+  <div class="card-body">
+    <div class="text-center mb-8">
+      <h3 style="color: var(--neutral-800); margin-bottom: 0.5rem;">System Overview</h3>
+      <p style="color: var(--neutral-600); font-size: 1.125rem;">Monitor platform activity and manage content</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="form-grid mb-8">
+      <div class="dashboard-card">
+        <h4>👥 Total Users</h4>
+        <div style="font-size: 2rem; color: var(--primary-color); font-weight: 700; margin: 1rem 0;">{{ total_users }}</div>
+        <p style="color: var(--neutral-600); margin: 0;">Registered users</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>📦 Products</h4>
+        <div style="font-size: 2rem; color: var(--secondary-color); font-weight: 700; margin: 1rem 0;">{{ total_products }}</div>
+        <p style="color: var(--neutral-600); margin: 0;">Listed products</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>⭐ Reviews</h4>
+        <div style="font-size: 2rem; color: var(--accent-color); font-weight: 700; margin: 1rem 0;">{{ total_reviews }}</div>
+        <p style="color: var(--neutral-600); margin: 0;">Customer reviews</p>
+      </div>
+      
+      <div class="dashboard-card">
+        <h4>🏷️ Categories</h4>
+        <div style="font-size: 2rem; color: var(--warning-color); font-weight: 700; margin: 1rem 0;">{{ total_categories }}</div>
+        <p style="color: var(--neutral-600); margin: 0;">Product categories</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="margin-bottom: 3rem;">
+      <h3 style="color: var(--neutral-800); margin-bottom: 2rem; text-align: center;">Admin Actions</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        
+        <div class="dashboard-card">
+          <h4>👥 User Management</h4>
+          <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Manage user accounts and permissions</p>
+          <a href="/admin/accounts/customuser/" class="btn-primary" style="text-decoration: none; font-size: 0.875rem;">Manage Users</a>
+        </div>
+        
+        <div class="dashboard-card">
+          <h4>📦 Product Management</h4>
+          <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Review and moderate products</p>
+          <a href="/admin/accounts/product/" class="btn-primary" style="text-decoration: none; font-size: 0.875rem;">Manage Products</a>
+        </div>
+        
+        <div class="dashboard-card">
+          <h4>🏷️ Categories</h4>
+          <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Add and manage product categories</p>
+          <a href="/admin/accounts/category/" class="btn-primary" style="text-decoration: none; font-size: 0.875rem;">Manage Categories</a>
+        </div>
+        
+        <div class="dashboard-card">
+          <h4>⭐ Reviews</h4>
+          <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Monitor and moderate reviews</p>
+          <a href="/admin/accounts/review/" class="btn-primary" style="text-decoration: none; font-size: 0.875rem;">Manage Reviews</a>
+        </div>
+        
+        <div class="dashboard-card">
+          <h4>📊 Analytics</h4>
+          <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">View platform statistics</p>
+          <button class="btn-secondary" style="font-size: 0.875rem;">View Reports</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <h4>⚙️ Settings</h4>
+          <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Configure platform settings</p>
+          <a href="/admin/" class="btn-secondary" style="text-decoration: none; font-size: 0.875rem;">Django Admin</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div style="border-top: 1px solid var(--neutral-200); padding-top: 2rem;">
+      <h3 style="color: var(--neutral-800); margin-bottom: 2rem;">Recent Activity</h3>
+      
+      <div class="dashboard-card">
+        <h4 style="margin-bottom: 1rem;">📈 Platform Health</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <div>
+            <p style="margin: 0.5rem 0;"><strong>System Status:</strong> <span style="color: var(--success-color);">✅ Online</span></p>
+            <p style="margin: 0.5rem 0;"><strong>Database:</strong> <span style="color: var(--success-color);">✅ Connected</span></p>
+          </div>
+          <div>
+            <p style="margin: 0.5rem 0;"><strong>Storage:</strong> <span style="color: var(--success-color);">✅ Available</span></p>
+            <p style="margin: 0.5rem 0;"><strong>Last Backup:</strong> <span style="color: var(--neutral-600);">Today</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

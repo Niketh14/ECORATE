@@ -1,0 +1,152 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Sustainable Products - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link active">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 1400px;">
+  <div class="card-header">
+    <h2>Sustainable Products</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Discover eco-friendly products that make a difference</p>
+  </div>
+
+  <div class="card-body">
+    <!-- Advanced Search & Filter Section -->
+    <div class="dashboard-card mb-8">
+      <h4 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+        <span>🔍</span> Search & Filter Products
+      </h4>
+      <form method="get">
+        <div class="form-grid">
+          <div style="grid-column: 1 / -1;">
+            <label class="form-label" for="search">Search Products</label>
+            <input type="text" name="search" id="search" class="form-control" placeholder="Search by name, brand, or description..." value="{{ search_query }}">
+          </div>
+          
+          <div>
+            <label class="form-label" for="category">Category</label>
+            <select name="category" id="category" class="form-select">
+              <option value="">All Categories</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"i" %}selected{% endif %}>
+                {{ category.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div>
+            <label class="form-label" for="eco_score">Min Eco Score</label>
+            <select name="eco_score" id="eco_score" class="form-select">
+              <option value="">Any Score</option>
+              <option value="7" {% if eco_score == '7' %}selected{% endif %}>7+ (Excellent)</option>
+              <option value="5" {% if eco_score == '5' %}selected{% endif %}>5+ (Good)</option>
+              <option value="3" {% if eco_score == '3' %}selected{% endif %}>3+ (Fair)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="form-label" for="min_price">Min Price ($)</label>
+            <input type="number" name="min_price" id="min_price" class="form-control" placeholder="0" value="{{ min_price }}">
+          </div>
+          
+          <div>
+            <label class="form-label" for="max_price">Max Price ($)</label>
+            <input type="number" name="max_price" id="max_price" class="form-control" placeholder="1000" value="{{ max_price }}">
+          </div>
+          
+          <div style="display: flex; align-items: end; gap: 0.5rem;">
+            <button type="submit" class="btn-primary" style="margin-bottom: 1rem;">Search</button>
+            <a href="{% url 'product_list' %}" class="btn-secondary" style="margin-bottom: 1rem; text-decoration: none;">Clear</a>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Product Stats -->
+    <div style="margin-bottom: 2rem; text-align: center;">
+      <p style="color: var(--neutral-600); font-size: 1.125rem;">
+        Showing <strong style="color: var(--primary-color);">{{ products|length }}</strong> sustainable products
+      </p>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid">
+      {% for product in products %}
+      <div class="product-card">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+        <div class="product-info">
+          <h4 class="product-title">{{ product.name }}</h4>
+          <p class="brand">{{ product.brand }}</p>
+          <p class="price">${{ product.price }}</p>
+          <div class="sustainability-score">
+            🌱 Eco Score: {{ product.sustainability_score }}/10
+          </div>
+          <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <a href="{% url 'product_detail' product.id %}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.875rem; padding: 0.5rem;">
+              View Details
+            </a>
+            <button onclick="toggleFavorite({{ product.id }}, this)" class="btn-secondary" style="padding: 0.5rem; font-size: 0.875rem;" title="Add to Favorites">
+              ❤️
+            </button>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+        <h3 style="color: var(--neutral-600); margin-bottom: 1rem;">No Products Found</h3>
+        <p style="color: var(--neutral-500);">Try adjusting your filters or check back later for new sustainable products!</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Call to Action -->
+    {% if products %}
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200); text-align: center;">
+      <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Can't find what you're looking for?</h3>
+      <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Help us grow our sustainable product database</p>
+      <a href="{% url 'contact' %}" class="btn-secondary" style="text-decoration: none;">Suggest a Product</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% csrf_token %}
+<script>
+function toggleFavorite(productId, button) {
+  fetch(`/toggle-favorite/${productId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    button.textContent = data.favorited ? '💚' : '❤️';
+    button.title = data.favorited ? 'Remove from Favorites' : 'Add to Favorites';
+  });
+}
+</script>
+
+{% endblock %}

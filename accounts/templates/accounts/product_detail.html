@@ -1,0 +1,127 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }} - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 1200px;">
+  <div class="card-body">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 2rem;">
+      <!-- Product Image -->
+      <div>
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 300px; object-fit: cover; border-radius: 12px; box-shadow: var(--shadow-md);">
+      </div>
+      
+      <!-- Product Info -->
+      <div>
+        <div class="mb-4">
+          <p class="brand">{{ product.brand }}</p>
+          <h1 style="color: var(--neutral-900); margin-bottom: 1rem;">{{ product.name }}</h1>
+          <p class="price" style="font-size: 2rem; margin-bottom: 1rem;">${{ product.price }}</p>
+          <div class="sustainability-score" style="display: inline-block;">
+            🌱 Eco Score: {{ product.sustainability_score }}/10
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Description</h3>
+          <p style="color: var(--neutral-600); line-height: 1.6;">{{ product.description }}</p>
+        </div>
+        
+        {% if product.eco_certifications %}
+        <div class="mb-6">
+          <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Certifications</h3>
+          <p style="color: var(--secondary-color); font-weight: 600;">{{ product.eco_certifications }}</p>
+        </div>
+        {% endif %}
+        
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button onclick="buyProduct({{ product.id }})" class="btn-primary" style="background: linear-gradient(135deg, #22c55e, #16a34a); border: none; cursor: pointer;">🛒 Buy Now - ${{ product.price }}</button>
+          <a href="{% url 'add_review' product.id %}" class="btn-secondary" style="text-decoration: none;">Write Review</a>
+          <button onclick="toggleFavorite({{ product.id }})" class="btn-secondary" id="favorite-btn">
+            {% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Reviews Section -->
+    <div style="border-top: 1px solid var(--neutral-200); padding-top: 2rem;">
+      <h3 style="color: var(--neutral-800); margin-bottom: 2rem;">Customer Reviews</h3>
+      
+      {% if product.reviews.all %}
+        <div style="display: grid; gap: 1.5rem;">
+          {% for review in product.reviews.all %}
+          <div class="dashboard-card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <div>
+                <h4 style="color: var(--neutral-800); margin-bottom: 0.5rem;">{{ review.user.username }}</h4>
+                <div style="color: var(--warning-color); margin-bottom: 0.5rem;">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}⭐{% else %}☆{% endif %}
+                  {% endfor %}
+                  <span style="margin-left: 0.5rem; color: var(--neutral-600);">{{ review.rating }}/5</span>
+                </div>
+              </div>
+              <small style="color: var(--neutral-500);">{{ review.created_at|date:"M d, Y" }}</small>
+            </div>
+            <p style="color: var(--neutral-700); margin-bottom: 1rem;">{{ review.comment }}</p>
+            {% if review.image %}
+            <img src="{{ review.image.url }}" alt="Review image" style="max-width: 200px; border-radius: 8px;">
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="dashboard-card text-center">
+          <p style="color: var(--neutral-500);">No reviews yet. Be the first to review this product!</p>
+          <a href="{% url 'add_review' product.id %}" class="btn-primary mt-4" style="text-decoration: none;">Write First Review</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% csrf_token %}
+<script>
+function toggleFavorite(productId) {
+  fetch(`/toggle-favorite/${productId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    const btn = document.getElementById('favorite-btn');
+    btn.textContent = data.favorited ? 'Remove from Favorites' : 'Add to Favorites';
+  });
+}
+
+function buyProduct(productId) {
+  if (confirm('Proceed with purchase? This will redirect you to the checkout page.')) {
+    window.location.href = `/buy-product/${productId}/`;
+  }
+}
+</script>
+{% endblock %}

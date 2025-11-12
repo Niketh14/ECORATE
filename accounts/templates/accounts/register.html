@@ -1,6 +1,92 @@
-<h2>Register</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Register</button>
-</form>
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Create Account - EcoRate{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div style="font-size: 2rem; margin-bottom: 1rem;">🌱</div>
+    <h2>Join EcoRate</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Create your account to start reviewing sustainable products</p>
+  </div>
+
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="form-grid">
+        <div>
+          <label class="form-label" for="id_username">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <ul class="errorlist">
+              {% for error in form.username.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        
+        <div>
+          <label class="form-label" for="id_email">Email Address</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <ul class="errorlist">
+              {% for error in form.email.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        
+        <div>
+          <label class="form-label" for="id_password1">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <ul class="errorlist">
+              {% for error in form.password1.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        
+        <div>
+          <label class="form-label" for="id_password2">Confirm Password</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <ul class="errorlist">
+              {% for error in form.password2.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        
+        <div style="grid-column: 1 / -1;">
+          <label class="form-label" for="id_user_type">Account Type</label>
+          {{ form.user_type }}
+          {% if form.user_type.errors %}
+            <ul class="errorlist">
+              {% for error in form.user_type.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <button type="submit" class="btn-primary" style="min-width: 200px;">Create Account</button>
+      </div>
+    </form>
+
+    <div class="text-center mt-6" style="padding-top: 1.5rem; border-top: 1px solid var(--neutral-200);">
+      <p style="color: var(--neutral-600);">Already have an account? 
+        <a href="{% url 'login' %}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Sign In</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

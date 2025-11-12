@@ -1,6 +1,59 @@
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Sign In - EcoRate{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px;">
+  <div class="card-header">
+    <div style="font-size: 2rem; margin-bottom: 1rem;">🌱</div>
+    <h2>Welcome Back</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Sign in to your EcoRate account</p>
+  </div>
+
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+
+      <div style="max-width: 400px; margin: 0 auto;">
+        <div class="mb-4">
+          <label class="form-label" for="id_username">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <ul class="errorlist">
+              {% for error in form.username.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="mb-6">
+          <label class="form-label" for="id_password">Password</label>
+          {{ form.password }}
+          {% if form.password.errors %}
+            <ul class="errorlist">
+              {% for error in form.password.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn-primary" style="width: 100%;">Sign In</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="text-center mt-6" style="padding-top: 1.5rem; border-top: 1px solid var(--neutral-200);">
+      <p style="color: var(--neutral-600); margin-bottom: 1rem;">Don't have an account? 
+        <a href="{% url 'register' %}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Create Account</a>
+      </p>
+      <p style="color: var(--neutral-600); margin: 0;">Forgot your password? 
+        <a href="{% url 'password_reset' %}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Reset Password</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

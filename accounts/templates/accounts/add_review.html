@@ -1,0 +1,91 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Review {{ product.name }} - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="max-width: 800px;">
+  <div class="card-header">
+    <h2>Write a Review</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Share your experience with {{ product.name }}</p>
+  </div>
+
+  <div class="card-body">
+    <!-- Product Info -->
+    <div class="dashboard-card mb-6">
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+        <div>
+          <h4 style="margin-bottom: 0.5rem;">{{ product.name }}</h4>
+          <p style="color: var(--neutral-600); margin: 0;">{{ product.brand }} - ${{ product.price }}</p>
+        </div>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <div class="mb-6">
+        <label class="form-label" for="id_rating">Rating</label>
+        {{ form.rating }}
+        {% if form.rating.errors %}
+          <ul class="errorlist">
+            {% for error in form.rating.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+      
+      <div class="mb-6">
+        <label class="form-label" for="id_comment">Your Review</label>
+        {{ form.comment }}
+        {% if form.comment.errors %}
+          <ul class="errorlist">
+            {% for error in form.comment.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+      
+      <div class="mb-6">
+        <label class="form-label" for="id_image">Add Photo (Optional)</label>
+        {{ form.image }}
+        {% if form.image.errors %}
+          <ul class="errorlist">
+            {% for error in form.image.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <p style="font-size: 0.75rem; color: var(--neutral-500); margin-top: 0.25rem;">Upload a photo to help others see the product</p>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn-primary">Submit Review</button>
+        <a href="{% url 'product_detail' product.id %}" class="btn-secondary" style="margin-left: 1rem; text-decoration: none;">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
