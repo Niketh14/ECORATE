@@ -1,0 +1,107 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Order Confirmed - EcoRate{% endblock %}
+
+{% block content %}
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'product_list' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      {% if user.is_authenticated %}
+        <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'user_orders' %}" class="nav-link">Orders</a>
+        <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+        <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+        <a href="{% url 'cart' %}" class="nav-link" style="position: relative;">
+          🛒
+        </a>
+      {% else %}
+        <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+        <a href="{% url 'login' %}" class="nav-link">Sign In</a>
+        <a href="{% url 'register' %}" class="nav-link">Register</a>
+      {% endif %}
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'about' %}" class="nav-link">About</a>
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 600px;">
+  <div class="card-body" style="text-align: center;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+    <h1 style="color: var(--success-color); margin-bottom: 1rem;">Order Confirmed!</h1>
+    <p style="color: var(--neutral-600); font-size: 1.1rem; margin-bottom: 2rem;">
+      Thank you for your purchase. Your order has been successfully placed.
+    </p>
+    
+    <div class="dashboard-card" style="margin-bottom: 2rem;">
+      <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Order Details</h3>
+      <div style="display: grid; gap: 0.5rem; text-align: left;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Order Numbers:</span>
+          <strong>
+            {% for order_id in order_ids %}
+              #{{ order_id }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Payment Method:</span>
+          <strong>
+            {% if payment_method == 'card' %}💳 Credit/Debit Card
+            {% elif payment_method == 'paypal' %}🅿️ PayPal
+            {% elif payment_method == 'upi' %}📱 UPI Payment
+            {% elif payment_method == 'cod' %}💵 Cash on Delivery
+            {% endif %}
+          </strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Order Date:</span>
+          <strong>{{ "now"|date:"M d, Y H:i" }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Status:</span>
+          <strong style="color: var(--warning-color);">📋 Pending</strong>
+        </div>
+      </div>
+    </div>
+    
+    <div class="dashboard-card" style="margin-bottom: 2rem;">
+      <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">What's Next?</h4>
+      <div style="text-align: left; color: var(--neutral-600);">
+        <p style="margin-bottom: 0.5rem;">1. ✅ Order placed successfully</p>
+        <p style="margin-bottom: 0.5rem;">2. 🔄 Seller will confirm stock availability</p>
+        <p style="margin-bottom: 0.5rem;">3. 📦 Your order will be shipped</p>
+        <p style="margin-bottom: 0.5rem;">4. 🚚 Track delivery status</p>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      {% if user.is_authenticated %}
+        <a href="{% url 'user_orders' %}" class="btn-primary" style="text-decoration: none;">
+          📦 View My Orders
+        </a>
+      {% endif %}
+      <a href="{% url 'product_list' %}" class="btn-secondary" style="text-decoration: none;">
+        🛍️ Continue Shopping
+      </a>
+      {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn-primary" style="text-decoration: none;">
+          📝 Create Account to Track Orders
+        </a>
+      {% endif %}
+    </div>
+    
+    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200);">
+      <p style="color: var(--neutral-500); font-size: 0.9rem;">
+        You will receive email updates about your order status.
+        <br>
+        For any questions, contact our support team.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

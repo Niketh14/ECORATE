@@ -7,18 +7,31 @@
 <!-- Navigation Bar -->
 <nav class="nav-bar">
   <div class="nav-container">
-    <a href="{% url 'user_home' %}" class="nav-brand">
+    <a href="{% url 'landing' %}" class="nav-brand">
       <span style="margin-right: 0.5rem;">🌱</span>EcoRate
     </a>
     <div class="nav-links">
-      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'landing' %}" class="nav-link">Home</a>
       <a href="{% url 'product_list' %}" class="nav-link active">Products</a>
       <a href="{% url 'about' %}" class="nav-link">About</a>
       <a href="{% url 'contact' %}" class="nav-link">Contact</a>
-      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
-      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
-      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
-      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+      {% if user.is_authenticated %}
+        {% if user.user_type == 'user' %}
+          <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+          <a href="{% url 'user_orders' %}" class="nav-link">Orders</a>
+          <a href="{% url 'cart' %}" class="nav-link" style="position: relative;">
+            🛒
+          </a>
+        {% elif user.user_type == 'seller' %}
+          <a href="{% url 'seller_home' %}" class="nav-link">Seller Dashboard</a>
+        {% endif %}
+        <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+        <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+        <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid var(--border-color);">
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-link">Sign In</a>
+        <a href="{% url 'register' %}" class="nav-link">Register</a>
+      {% endif %}
     </div>
   </div>
 </nav>
@@ -30,19 +43,36 @@
   </div>
 
   <div class="card-body">
-    <!-- Advanced Search & Filter Section -->
+    <!-- Search Bar -->
     <div class="dashboard-card mb-8">
-      <h4 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-        <span>🔍</span> Search & Filter Products
-      </h4>
-      <form method="get">
-        <div class="form-grid">
-          <div style="grid-column: 1 / -1;">
-            <label class="form-label" for="search">Search Products</label>
-            <input type="text" name="search" id="search" class="form-control" placeholder="Search by name, brand, or description..." value="{{ search_query }}">
+      <h4 style="margin-bottom: 1rem; color: var(--neutral-800);">🔍 Search Products</h4>
+      <div style="position: relative;">
+        <input type="text" name="search" id="search" class="form-control" placeholder="Search by name, brand, or description..." value="{{ search_query }}" autocomplete="off" style="font-size: 1.1rem; padding: 1rem;">
+        <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div style="display: flex; gap: 2rem; align-items: flex-start;">
+      <!-- Sidebar Filters -->
+      <div style="flex: 0 0 280px; background: var(--neutral-50); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <h4 style="margin-bottom: 1.5rem; color: var(--neutral-800);">🔍 Filters & Sort</h4>
+        
+        <form method="get" id="searchForm">
+          <input type="hidden" name="search" id="searchHidden" value="{{ search_query }}">
+          
+          <!-- Sort Options -->
+          <div style="margin-bottom: 1.5rem;">
+            <label class="form-label" for="sort">Sort by</label>
+            <select name="sort" id="sort" class="form-select" onchange="applySort(this.value)">
+              <option value="">Default (Newest First)</option>
+              <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Name: A to Z</option>
+              <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Name: Z to A</option>
+            </select>
           </div>
           
-          <div>
+          <!-- Category Filter -->
+          <div style="margin-bottom: 1.5rem;">
             <label class="form-label" for="category">Category</label>
             <select name="category" id="category" class="form-select">
               <option value="">All Categories</option>
@@ -54,7 +84,8 @@
             </select>
           </div>
           
-          <div>
+          <!-- Eco Score Filter -->
+          <div style="margin-bottom: 1.5rem;">
             <label class="form-label" for="eco_score">Min Eco Score</label>
             <select name="eco_score" id="eco_score" class="form-select">
               <option value="">Any Score</option>
@@ -64,33 +95,36 @@
             </select>
           </div>
           
-          <div>
+          <!-- Price Range -->
+          <div style="margin-bottom: 1.5rem;">
             <label class="form-label" for="min_price">Min Price ($)</label>
             <input type="number" name="min_price" id="min_price" class="form-control" placeholder="0" value="{{ min_price }}">
           </div>
           
-          <div>
+          <div style="margin-bottom: 1.5rem;">
             <label class="form-label" for="max_price">Max Price ($)</label>
             <input type="number" name="max_price" id="max_price" class="form-control" placeholder="1000" value="{{ max_price }}">
           </div>
           
-          <div style="display: flex; align-items: end; gap: 0.5rem;">
-            <button type="submit" class="btn-primary" style="margin-bottom: 1rem;">Search</button>
-            <a href="{% url 'product_list' %}" class="btn-secondary" style="margin-bottom: 1rem; text-decoration: none;">Clear</a>
+          <!-- Action Buttons -->
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button type="submit" class="btn-primary">Apply Filters</button>
+            <a href="{% url 'product_list' %}" class="btn-secondary" style="text-decoration: none; text-align: center;">Clear All</a>
           </div>
+        </form>
+      </div>
+
+      <!-- Products Section -->
+      <div style="flex: 1;">
+        <!-- Product Stats -->
+        <div style="margin-bottom: 2rem; padding: 1rem; background: var(--neutral-50); border-radius: 8px; border: 1px solid var(--border-color);">
+          <p style="color: var(--neutral-600); font-size: 1.125rem; margin: 0;">
+            Showing <strong style="color: var(--primary-color);">{{ products|length }}</strong> sustainable products
+          </p>
         </div>
-      </form>
-    </div>
 
-    <!-- Product Stats -->
-    <div style="margin-bottom: 2rem; text-align: center;">
-      <p style="color: var(--neutral-600); font-size: 1.125rem;">
-        Showing <strong style="color: var(--primary-color);">{{ products|length }}</strong> sustainable products
-      </p>
-    </div>
-
-    <!-- Product Grid -->
-    <div class="product-grid">
+        <!-- Product Grid -->
+        <div class="product-grid">
       {% for product in products %}
       <div class="product-card">
         <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
@@ -105,9 +139,11 @@
             <a href="{% url 'product_detail' product.id %}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.875rem; padding: 0.5rem;">
               View Details
             </a>
+            {% if user.is_authenticated and user.user_type == 'user' %}
             <button onclick="toggleFavorite({{ product.id }}, this)" class="btn-secondary" style="padding: 0.5rem; font-size: 0.875rem;" title="Add to Favorites">
               ❤️
             </button>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -117,21 +153,25 @@
         <h3 style="color: var(--neutral-600); margin-bottom: 1rem;">No Products Found</h3>
         <p style="color: var(--neutral-500);">Try adjusting your filters or check back later for new sustainable products!</p>
       </div>
-      {% endfor %}
-    </div>
+        {% endfor %}
+        </div>
 
-    <!-- Call to Action -->
-    {% if products %}
-    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200); text-align: center;">
-      <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Can't find what you're looking for?</h3>
-      <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Help us grow our sustainable product database</p>
-      <a href="{% url 'contact' %}" class="btn-secondary" style="text-decoration: none;">Suggest a Product</a>
+        <!-- Call to Action -->
+        {% if products %}
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200); text-align: center;">
+          <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Can't find what you're looking for?</h3>
+          <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">Help us grow our sustainable product database</p>
+          <a href="{% url 'contact' %}" class="btn-secondary" style="text-decoration: none;">Suggest a Product</a>
+        </div>
+        {% endif %}
+      </div>
     </div>
-    {% endif %}
   </div>
 </div>
 
+{% if user.is_authenticated %}
 {% csrf_token %}
+{% endif %}
 <script>
 function toggleFavorite(productId, button) {
   fetch(`/toggle-favorite/${productId}/`, {
@@ -147,6 +187,167 @@ function toggleFavorite(productId, button) {
     button.title = data.favorited ? 'Remove from Favorites' : 'Add to Favorites';
   });
 }
+
+function applySort(sortValue) {
+  // Get current URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  // Update or remove sort parameter
+  if (sortValue && sortValue.trim() !== '') {
+    urlParams.set('sort', sortValue);
+  } else {
+    urlParams.delete('sort');
+  }
+  
+  // Reload page with new parameters
+  window.location.search = urlParams.toString();
+}
+
+// Update search hidden field when search input changes
+document.getElementById('search').addEventListener('input', function() {
+  document.getElementById('searchHidden').value = this.value;
+});
+
+// Search Autocomplete Functionality
+(function() {
+  const searchInput = document.getElementById('search');
+  const suggestionsContainer = document.getElementById('searchSuggestions');
+  let debounceTimer;
+  let currentSuggestions = [];
+
+  if (!searchInput || !suggestionsContainer) return;
+
+  // Debounce function to limit API calls
+  function debounce(func, wait) {
+    return function(...args) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  // Fetch suggestions from API
+  function fetchSuggestions(query) {
+    if (query.length < 2) {
+      suggestionsContainer.style.display = 'none';
+      return;
+    }
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    const headers = {};
+    if (csrfToken) {
+      headers['X-CSRFToken'] = csrfToken.value;
+    }
+    
+    fetch(`{% url 'product_search_suggestions' %}?q=${encodeURIComponent(query)}`, {
+      headers: headers
+    })
+    .then(response => response.json())
+    .then(data => {
+      currentSuggestions = data.suggestions || [];
+      displaySuggestions(currentSuggestions);
+    })
+    .catch(error => {
+      console.error('Error fetching suggestions:', error);
+      suggestionsContainer.style.display = 'none';
+    });
+  }
+
+  // Display suggestions in dropdown
+  function displaySuggestions(suggestions) {
+    if (suggestions.length === 0) {
+      suggestionsContainer.innerHTML = '<div class="suggestion-empty">No products found</div>';
+      suggestionsContainer.style.display = 'block';
+      return;
+    }
+
+    suggestionsContainer.innerHTML = suggestions.map(product => `
+      <div class="suggestion-item" data-product-id="${product.id}">
+        <img src="${product.image}" alt="${product.name}" class="suggestion-image" onerror="this.style.display='none'">
+        <div class="suggestion-content">
+          <div class="suggestion-name">${escapeHtml(product.name)}</div>
+          <div class="suggestion-brand">${escapeHtml(product.brand)}</div>
+          <div class="suggestion-price">$${product.price}</div>
+        </div>
+      </div>
+    `).join('');
+
+    suggestionsContainer.style.display = 'block';
+
+    // Add click handlers to suggestions
+    suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const productId = this.getAttribute('data-product-id');
+        window.location.href = `/products/${productId}/`;
+      });
+    });
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Debounced search function
+  const debouncedSearch = debounce(fetchSuggestions, 300);
+
+  // Handle input events
+  searchInput.addEventListener('input', function(e) {
+    const query = e.target.value.trim();
+    document.getElementById('searchHidden').value = query;
+    debouncedSearch(query);
+  });
+  
+  // Handle Enter key to submit form
+  searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !suggestionsContainer.querySelector('.suggestion-highlighted')) {
+      e.preventDefault();
+      document.getElementById('searchForm').submit();
+    }
+  });
+
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+      suggestionsContainer.style.display = 'none';
+    }
+  });
+
+  // Handle keyboard navigation
+  searchInput.addEventListener('keydown', function(e) {
+    const visibleSuggestions = suggestionsContainer.querySelectorAll('.suggestion-item');
+    
+    if (visibleSuggestions.length === 0) return;
+
+    let currentIndex = Array.from(visibleSuggestions).findIndex(item => 
+      item.classList.contains('suggestion-highlighted')
+    );
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentIndex = (currentIndex + 1) % visibleSuggestions.length;
+      visibleSuggestions.forEach(item => item.classList.remove('suggestion-highlighted'));
+      visibleSuggestions[currentIndex].classList.add('suggestion-highlighted');
+      visibleSuggestions[currentIndex].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentIndex = currentIndex <= 0 ? visibleSuggestions.length - 1 : currentIndex - 1;
+      visibleSuggestions.forEach(item => item.classList.remove('suggestion-highlighted'));
+      visibleSuggestions[currentIndex].classList.add('suggestion-highlighted');
+      visibleSuggestions[currentIndex].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      const highlighted = suggestionsContainer.querySelector('.suggestion-highlighted');
+      if (highlighted) {
+        e.preventDefault();
+        const productId = highlighted.getAttribute('data-product-id');
+        window.location.href = `/products/${productId}/`;
+      }
+    } else if (e.key === 'Escape') {
+      suggestionsContainer.style.display = 'none';
+    }
+  });
+})();
 </script>
 
 {% endblock %}

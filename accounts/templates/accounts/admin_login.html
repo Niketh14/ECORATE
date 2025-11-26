@@ -1,0 +1,80 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Admin Login - EcoRate{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>🔐 Admin Login</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Administrator Access Only</p>
+  </div>
+
+  <div class="card-body">
+    <div class="text-center mb-6">
+      <div style="font-size: 4rem; margin-bottom: 1rem;">⚙️</div>
+      <h3 style="color: var(--neutral-800); margin-bottom: 0.5rem;">System Administration</h3>
+      <p style="color: var(--neutral-600); font-size: 1.125rem;">Please enter your administrator credentials</p>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Administrator Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="error-message">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Administrator Password</label>
+        <div class="password-wrapper">
+          {{ form.password }}
+          <button type="button" class="password-toggle" onclick="togglePassword('{{ form.password.id_for_label }}', this)" aria-label="Toggle password visibility">
+            Show
+          </button>
+        </div>
+        {% if form.password.errors %}
+          <div class="error-message">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="error-message" style="margin-bottom: 1rem;">
+          {{ form.non_field_errors.0 }}
+        </div>
+      {% endif %}
+
+      <button type="submit" class="btn-primary" style="width: 100%; margin-bottom: 1rem;">
+        🔓 Access Admin Panel
+      </button>
+    </form>
+
+    <div style="text-align: center; padding-top: 1rem; border-top: 1px solid var(--neutral-200);">
+      <p style="color: var(--neutral-600); font-size: 0.875rem; margin-bottom: 1rem;">
+        ⚠️ Authorized personnel only. All access attempts are logged.
+      </p>
+      <a href="{% url 'landing' %}" class="btn-secondary" style="text-decoration: none;">
+        ← Back to Home
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePassword(inputId, button) {
+  const passwordInput = document.getElementById(inputId);
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    button.textContent = 'Hide';
+    button.setAttribute('aria-label', 'Hide password');
+  } else {
+    passwordInput.type = 'password';
+    button.textContent = 'Show';
+    button.setAttribute('aria-label', 'Show password');
+  }
+}
+</script>
+{% endblock %}

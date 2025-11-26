@@ -1,0 +1,78 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}My Products - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'seller_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate Seller
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'seller_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'seller_products' %}" class="nav-link active">My Products</a>
+      <a href="{% url 'add_product' %}" class="nav-link">Add Product</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="card">
+  <div class="card-header">
+    <h2>My Products</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">Manage your product listings</p>
+  </div>
+
+  <div class="card-body">
+    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+      <h3 style="color: var(--neutral-800); margin: 0;">Your Product Listings ({{ products.count }})</h3>
+      <a href="{% url 'add_product' %}" class="btn-primary" style="text-decoration: none;">➕ Add New Product</a>
+    </div>
+
+    {% if products %}
+      <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+          <div class="product-info">
+            <h4 class="product-title">{{ product.name }}</h4>
+            <p class="brand">{{ product.brand }}</p>
+            <p class="category" style="color: var(--neutral-600); font-size: 0.875rem;">{{ product.category.name }}</p>
+            <p class="price">${{ product.price }}</p>
+            <div class="sustainability-score">
+              🌱 Eco Score: {{ product.sustainability_score }}/10
+            </div>
+            <div style="margin-top: 0.5rem;">
+              {% if product.status == 'approved' %}
+                <span style="background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">✅ Approved</span>
+              {% elif product.status == 'pending' %}
+                <span style="background: #fff3cd; color: #856404; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">⏳ Pending Review</span>
+              {% elif product.status == 'rejected' %}
+                <span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">❌ Rejected</span>
+              {% endif %}
+            </div>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+              <a href="{% url 'product_detail' product.id %}" class="btn-secondary" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.875rem; padding: 0.5rem;">View</a>
+              <button class="btn-primary" style="padding: 0.5rem; font-size: 0.875rem;">Edit</button>
+            </div>
+            <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--neutral-600);">
+              {{ product.reviews.count }} review{{ product.reviews.count|pluralize }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="dashboard-card text-center">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+        <h4 style="margin-bottom: 1rem;">No Products Listed</h4>
+        <p style="color: var(--neutral-600); margin-bottom: 2rem;">You haven't added any products yet. Start by listing your first sustainable product.</p>
+        <a href="{% url 'add_product' %}" class="btn-primary" style="text-decoration: none;">Add Your First Product</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

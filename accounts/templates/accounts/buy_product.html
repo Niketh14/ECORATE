@@ -7,18 +7,25 @@
 <!-- Navigation Bar -->
 <nav class="nav-bar">
   <div class="nav-container">
-    <a href="{% url 'user_home' %}" class="nav-brand">
+    <a href="{% url 'product_list' %}" class="nav-brand">
       <span style="margin-right: 0.5rem;">🌱</span>EcoRate
     </a>
     <div class="nav-links">
-      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+        <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+        {% if user.profile_pic %}
+          <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+        {% endif %}
+      {% else %}
+        <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+        <a href="{% url 'login' %}" class="nav-link">Sign In</a>
+        <a href="{% url 'register' %}" class="nav-link">Register</a>
+      {% endif %}
       <a href="{% url 'product_list' %}" class="nav-link">Products</a>
       <a href="{% url 'about' %}" class="nav-link">About</a>
       <a href="{% url 'contact' %}" class="nav-link">Contact</a>
-      <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
-      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
-      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
-      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
     </div>
   </div>
 </nav>
@@ -41,68 +48,253 @@
     </div>
 
     <!-- Checkout Form -->
-    <form method="post" class="dashboard-card">
+    <form method="post" id="buy-form">
       {% csrf_token %}
-      <h3 style="color: var(--neutral-800); margin-bottom: 1.5rem;">Payment Information</h3>
+      <input type="hidden" name="quantity" value="1">
       
-      <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
-        <div>
-          <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Full Name</label>
-          <input type="text" name="full_name" class="form-control" value="{{ user.first_name }} {{ user.last_name }}" required>
-        </div>
+      <!-- Customer Information -->
+      <div class="dashboard-card" style="margin-bottom: 2rem;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1.5rem;">{% if is_guest %}Guest Checkout - {% endif %}Customer Information</h3>
         
-        <div>
-          <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Email</label>
-          <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
-        </div>
-        
-        <div>
-          <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Phone Number</label>
-          <input type="tel" name="phone" class="form-control" value="{{ user.phone_number }}" required>
-        </div>
-        
-        <div>
-          <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Shipping Address</label>
-          <textarea name="address" class="form-control" rows="3" placeholder="Enter your complete shipping address" required>{{ user.location }}</textarea>
-        </div>
-        
-        <div style="border-top: 1px solid var(--neutral-200); padding-top: 1rem;">
-          <h4 style="color: var(--neutral-800); margin-bottom: 1rem;">Payment Method</h4>
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border-radius: 8px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(34, 197, 94, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
-              <input type="radio" name="payment_method" value="card" checked style="margin: 0; width: 16px; height: 16px; flex-shrink: 0;">
-              <span style="font-size: 1rem; line-height: 1; display: flex; align-items: center;">💳 Credit/Debit Card</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border-radius: 8px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(34, 197, 94, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
-              <input type="radio" name="payment_method" value="paypal" style="margin: 0; width: 16px; height: 16px; flex-shrink: 0;">
-              <span style="font-size: 1rem; line-height: 1; display: flex; align-items: center;">🅿️ PayPal</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border-radius: 8px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(34, 197, 94, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
-              <input type="radio" name="payment_method" value="cod" style="margin: 0; width: 16px; height: 16px; flex-shrink: 0;">
-              <span style="font-size: 1rem; line-height: 1; display: flex; align-items: center;">💵 Cash on Delivery</span>
-            </label>
+        <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Full Name</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" value="{% if user.is_authenticated %}{{ user.first_name }} {{ user.last_name }}{% endif %}" required>
           </div>
+          
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Email</label>
+            <input type="email" id="email" name="email" class="form-control" value="{% if user.is_authenticated %}{{ user.email }}{% endif %}" required>
+          </div>
+          
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="form-control" value="{% if user.is_authenticated %}{{ user.phone_number }}{% endif %}" required>
+          </div>
+          
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--neutral-700); font-weight: 600;">Shipping Address</label>
+            <textarea id="address" name="address" class="form-control" rows="3" placeholder="Enter your complete shipping address" required>{% if user.is_authenticated %}{{ user.location }}{% endif %}</textarea>
+          </div>
+          
+          {% if is_guest %}
+          <p style="color: var(--neutral-600); font-size: 0.875rem; padding: 0.75rem; background: var(--neutral-100); border-radius: 8px;">
+            💡 <strong>Guest Checkout:</strong> You can complete your purchase without creating an account. Your order will be processed using the information provided above.
+          </p>
+          {% endif %}
         </div>
       </div>
       
-      <!-- Total -->
-      <div style="border-top: 1px solid var(--neutral-200); padding-top: 1rem; margin-bottom: 1.5rem;">
-        <div style="display: flex; justify-content: between; align-items: center;">
-          <span style="font-size: 1.2rem; font-weight: 600; color: var(--neutral-800);">Total: ${{ product.price }}</span>
-          <div class="sustainability-score" style="margin-left: auto;">
-            🌱 Eco Score: {{ product.sustainability_score }}/10
-          </div>
+      <!-- Payment Method Selection -->
+      <div class="dashboard-card" style="margin-bottom: 2rem;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1.5rem; font-size: 1.3rem; border-bottom: 2px solid #f3f4f6; padding-bottom: 0.5rem;">💳 Select Payment Method</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <label class="payment-option" data-method="card" onclick="selectPayment('card')">
+            <input type="radio" name="payment_method" value="card" checked style="display: none;">
+            <div class="payment-card active">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">💳</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">Card Payment</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Credit/Debit Cards</p>
+            </div>
+          </label>
+          <label class="payment-option" data-method="paypal" onclick="selectPayment('paypal')">
+            <input type="radio" name="payment_method" value="paypal" style="display: none;">
+            <div class="payment-card">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">🅿️</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">PayPal</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Secure & Fast</p>
+            </div>
+          </label>
+          <label class="payment-option" data-method="upi" onclick="selectPayment('upi')">
+            <input type="radio" name="payment_method" value="upi" style="display: none;">
+            <div class="payment-card">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">UPI</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Instant Payment</p>
+            </div>
+          </label>
+          <label class="payment-option" data-method="cod" onclick="selectPayment('cod')">
+            <input type="radio" name="payment_method" value="cod" style="display: none;">
+            <div class="payment-card">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">💵</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">Cash on Delivery</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Pay at Doorstep</p>
+            </div>
+          </label>
         </div>
       </div>
       
-      <!-- Action Buttons -->
-      <div style="display: flex; gap: 1rem; justify-content: center;">
-        <a href="{% url 'product_detail' product.id %}" class="btn-secondary" style="text-decoration: none;">← Back to Product</a>
-        <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
-          🛒 Complete Purchase
-        </button>
+      <!-- Payment Details Forms -->
+      
+      <!-- Card Payment Details -->
+      <div id="card-details" class="dashboard-card" style="margin-bottom: 2rem;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Card Details</h3>
+        <div style="display: grid; gap: 1rem;">
+          <div>
+            <input type="text" id="card-number" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%; font-size: 16px;" oninput="formatCardNumber(this)">
+            <small style="color: var(--neutral-500);">16-digit card number</small>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;" oninput="formatExpiry(this)">
+              <small style="color: var(--neutral-500);">Valid month/year</small>
+            </div>
+            <div>
+              <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;" oninput="formatCVV(this)">
+              <small style="color: var(--neutral-500);">3-digit CVV</small>
+            </div>
+          </div>
+          <input type="text" name="cardholder_name" placeholder="Cardholder Name" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;">
+        </div>
+      </div>
+      
+      <!-- Other Payment Details -->
+      <div id="paypal-details" class="dashboard-card" style="margin-bottom: 2rem; display: none;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">PayPal Payment</h3>
+        <p style="color: var(--neutral-600);">You will be redirected to PayPal to complete your payment.</p>
+      </div>
+      
+      <div id="upi-details" class="dashboard-card" style="margin-bottom: 2rem; display: none;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">UPI Payment</h3>
+        <input type="text" name="upi_id" placeholder="yourname@upi" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;">
+        <small style="color: var(--neutral-500);">Enter your UPI ID</small>
+      </div>
+      
+      <div id="cod-details" class="dashboard-card" style="margin-bottom: 2rem; display: none;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Cash on Delivery</h3>
+        <p style="color: var(--neutral-600);">Pay when your order is delivered. Additional ₹50 COD charges may apply.</p>
+      </div>
+      </div>
+      
+      
+      <div style="text-align: center;">
+        <button type="submit" class="btn-primary" style="font-size: 1.1rem; padding: 15px 30px;">Complete Purchase - ${{ product.price }}</button>
       </div>
     </form>
   </div>
 </div>
+
+<style>
+.payment-card {
+  padding: 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.payment-card:hover {
+  border-color: #0066cc;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+}
+
+.payment-card.active {
+  border-color: #0066cc;
+  background: #0066cc;
+  color: white;
+}
+
+.payment-card.active h4,
+.payment-card.active p {
+  color: white;
+}
+</style>
+
+<script>
+function selectPayment(method) {
+  document.querySelectorAll('.payment-card').forEach(card => {
+    card.classList.remove('active');
+  });
+  
+  document.querySelector(`[data-method="${method}"] .payment-card`).classList.add('active');
+  
+  document.getElementById('card-details').style.display = 'none';
+  document.getElementById('paypal-details').style.display = 'none';
+  document.getElementById('upi-details').style.display = 'none';
+  document.getElementById('cod-details').style.display = 'none';
+  
+  if (method === 'card') {
+    document.getElementById('card-details').style.display = 'block';
+  } else if (method === 'paypal') {
+    document.getElementById('paypal-details').style.display = 'block';
+  } else if (method === 'upi') {
+    document.getElementById('upi-details').style.display = 'block';
+  } else if (method === 'cod') {
+    document.getElementById('cod-details').style.display = 'block';
+  }
+}
+
+function formatCardNumber(input) {
+  let value = input.value.replace(/\D/g, '');
+  value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+  input.value = value;
+}
+
+function formatExpiry(input) {
+  let value = input.value.replace(/\D/g, '');
+  if (value.length >= 2) {
+    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+  }
+  input.value = value;
+}
+
+function formatCVV(input) {
+  input.value = input.value.replace(/\D/g, '');
+}
+
+document.getElementById('buy-form').addEventListener('submit', function(e) {
+  // Validate customer information for guest checkout
+  {% if is_guest %}
+  const fullName = document.getElementById('full_name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+  
+  if (!fullName || !email || !phone || !address) {
+    alert('Please fill in all customer information fields.');
+    e.preventDefault();
+    return;
+  }
+  {% endif %}
+  
+  const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+  
+  if (paymentMethod === 'card') {
+    const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+    const expiry = document.getElementById('expiry').value;
+    const cvv = document.getElementById('cvv').value;
+    
+    if (cardNumber.length !== 16) {
+      alert('Please enter a valid 16-digit card number');
+      e.preventDefault();
+      return;
+    }
+    
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      alert('Please enter a valid expiry date (MM/YY)');
+      e.preventDefault();
+      return;
+    }
+    
+    if (cvv.length !== 3) {
+      alert('Please enter a valid 3-digit CVV');
+      e.preventDefault();
+      return;
+    }
+    
+    const [month, year] = expiry.split('/');
+    const currentDate = new Date();
+    const expiryDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
+    
+    if (expiryDate <= currentDate) {
+      alert('Card has expired. Please use a valid card.');
+      e.preventDefault();
+      return;
+    }
+  }
+});
+</script>
 {% endblock %}

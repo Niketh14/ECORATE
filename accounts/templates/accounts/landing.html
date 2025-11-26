@@ -17,38 +17,169 @@
     <link rel="stylesheet" href="{% static 'accounts/style.css' %}">
 </head>
 <body>
-    <div class="container">
-        <div style="margin-bottom: 2rem;">
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="{% url 'landing' %}" class="nav-brand">
+                <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'landing' %}" class="nav-link active">Home</a>
+                <a href="{% url 'product_list' %}" class="nav-link">Search</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link">Sign In</a>
+                    <a href="{% url 'register' %}" class="nav-link">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div style="margin-top: 2rem; padding: 0 1rem; width: 100%; box-sizing: border-box;">
+        <!-- Hero Section -->
+        <div style="text-align: center; margin-bottom: 3rem;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">🌱</div>
             <h1>Welcome to EcoRate</h1>
             <p style="font-size: 1.25rem; color: var(--neutral-600); margin-bottom: 2rem;">Discover, review, and rate sustainable products that make a difference for our planet.</p>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
+                <a href="{% url 'login' %}" class="btn-primary">Sign In</a>
+                <a href="{% url 'register' %}" class="btn-secondary" style="text-decoration: none;">Create Account</a>
+            </div>
         </div>
-        
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="{% url 'login' %}" class="button">Sign In</a>
-            <a href="{% url 'register' %}" class="btn-secondary" style="text-decoration: none;">Create Account</a>
+
+        <!-- Products Section -->
+        <div style="margin-bottom: 3rem;">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--neutral-800);">Featured Sustainable Products</h2>
+            
+            {% if products %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; width: 100%;">
+                    {% for product in products %}
+                    <div class="product-card" style="cursor: pointer;">
+                        <!-- Image Slider Container -->
+                        <div style="position: relative; width: 100%; height: 200px; overflow: hidden; border-radius: 8px 8px 0 0;">
+                            {% if product.additional_images.all %}
+                                <!-- Display current image -->
+                                {% for img in product.additional_images.all %}
+                                    {% if forloop.counter0 == product.current_image_index %}
+                                        <img src="{{ img.image.url }}" alt="{{ product.name }}" class="product-image" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <!-- Navigation arrows -->
+                                {% if product.additional_images.all|length > 1 %}
+                                <div style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); z-index: 10;">
+                                    {% if product.current_image_index > 0 %}
+                                        <a href="?img_{{ product.id }}={{ product.current_image_index|add:-1 }}#product-{{ product.id }}" style="background: rgba(0,0,0,0.5); color: white; padding: 8px 12px; border-radius: 50%; text-decoration: none; font-size: 18px;">‹</a>
+                                    {% endif %}
+                                </div>
+                                <div style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); z-index: 10;">
+                                    {% with max_index=product.additional_images.all|length|add:-1 %}
+                                    {% if product.current_image_index < max_index %}
+                                        <a href="?img_{{ product.id }}={{ product.current_image_index|add:1 }}#product-{{ product.id }}" style="background: rgba(0,0,0,0.5); color: white; padding: 8px 12px; border-radius: 50%; text-decoration: none; font-size: 18px;">›</a>
+                                    {% endif %}
+                                    {% endwith %}
+                                </div>
+                                
+                                <!-- Image indicators -->
+                                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px;">
+                                    {% for img in product.additional_images.all %}
+                                        <a href="?img_{{ product.id }}={{ forloop.counter0 }}#product-{{ product.id }}" style="width: 8px; height: 8px; border-radius: 50%; background: {% if forloop.counter0 == product.current_image_index %}white{% else %}rgba(255,255,255,0.5){% endif %}; display: block; text-decoration: none;"></a>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <!-- Default product image -->
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        
+                        <div class="product-info" id="product-{{ product.id }}">
+                            <h4 class="product-title">{{ product.name }}</h4>
+                            <p class="brand">{{ product.brand }}</p>
+                            <p class="price">${{ product.price }}</p>
+                            <div class="sustainability-score">
+                                🌱 Eco Score: {{ product.sustainability_score }}/10
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <a href="{% url 'product_detail' product.id %}" class="btn-primary" style="width: 100%; text-decoration: none; display: block; text-align: center;">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="{% url 'product_list' %}" class="btn-secondary" style="text-decoration: none;">View All Products</a>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                    <h3>No Products Available</h3>
+                    <p style="color: var(--neutral-600);">Products will appear here once sellers start listing them.</p>
+                </div>
+            {% endif %}
         </div>
-        
-        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--neutral-200);">
-            <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Why Choose EcoRate?</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: left;">
-                <div>
-                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🌍</div>
+
+        <!-- Features Section -->
+        <div style="border-top: 1px solid var(--neutral-200); padding-top: 3rem;">
+            <h3 style="color: var(--neutral-800); margin-bottom: 2rem; text-align: center;">Why Choose EcoRate?</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div style="text-align: center; padding: 1.5rem;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🌍</div>
                     <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Eco-Friendly Focus</h4>
-                    <p style="font-size: 0.9rem; margin: 0;">Find products that prioritize sustainability and environmental responsibility.</p>
+                    <p style="font-size: 0.9rem; margin: 0; color: var(--neutral-600);">Find products that prioritize sustainability and environmental responsibility.</p>
                 </div>
-                <div>
-                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⭐</div>
+                <div style="text-align: center; padding: 1.5rem;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">⭐</div>
                     <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Trusted Reviews</h4>
-                    <p style="font-size: 0.9rem; margin: 0;">Read authentic reviews from verified users who care about sustainability.</p>
+                    <p style="font-size: 0.9rem; margin: 0; color: var(--neutral-600);">Read authentic reviews from verified users who care about sustainability.</p>
                 </div>
-                <div>
-                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</div>
+                <div style="text-align: center; padding: 1.5rem;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
                     <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Impact Tracking</h4>
-                    <p style="font-size: 0.9rem; margin: 0;">Track your environmental impact through sustainable purchasing decisions.</p>
+                    <p style="font-size: 0.9rem; margin: 0; color: var(--neutral-600);">Track your environmental impact through sustainable purchasing decisions.</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Admin Icon -->
+    <a href="{% url 'admin_login' %}" style="position: fixed; bottom: 20px; right: 20px; background: var(--primary-color); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s ease; z-index: 1000;">
+        ⚙️
+    </a>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>🌱 EcoRate</h4>
+                <p>Empowering sustainable choices through community reviews. Join us in building a greener future.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="{% url 'landing' %}">Home</a>
+                <a href="{% url 'product_list' %}">Products</a>
+                <a href="{% url 'about' %}">About Us</a>
+                <a href="{% url 'contact' %}">Contact</a>
+                <a href="{% url 'faq' %}">FAQ</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Email: info@ecorate.com</p>
+                <p>Phone: +1 (555) 123-4567</p>
+                <p>Address: 123 Green Street, Eco City, EC 12345</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {% now "Y" %} EcoRate. All rights reserved.</p>
+            <p>Made with ❤️ for a sustainable future</p>
+        </div>
+    </footer>
+
 </body>
 </html>
