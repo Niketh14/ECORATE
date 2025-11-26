@@ -12,7 +12,8 @@
     </a>
     <div class="nav-links">
       <a href="{% url 'seller_home' %}" class="nav-link active">Dashboard</a>
-      <a href="{% url 'product_list' %}" class="nav-link">All Products</a>
+      <a href="{% url 'seller_products' %}" class="nav-link">My Products</a>
+      <a href="{% url 'seller_orders' %}" class="nav-link">Orders {% if pending_orders %}<span style="background: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; margin-left: 4px;">{{ pending_orders }}</span>{% endif %}</a>
       <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
       <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
     </div>
@@ -52,19 +53,28 @@
       </div>
       
       <div class="dashboard-card">
-        <h4>📈 This Month</h4>
-        <div style="font-size: 2rem; color: var(--warning-color); font-weight: 700; margin: 1rem 0;">+{{ products|length }}</div>
-        <p style="color: var(--neutral-600); margin: 0;">New products</p>
+        <h4>📦 Orders</h4>
+        <div style="font-size: 2rem; color: var(--warning-color); font-weight: 700; margin: 1rem 0;">{{ total_orders }}</div>
+        <p style="color: var(--neutral-600); margin: 0;">Total orders</p>
       </div>
     </div>
+
+    <!-- Order Notifications -->
+    {% if pending_orders %}
+    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+      <h4 style="color: #856404; margin: 0 0 0.5rem 0;">🔔 New Orders!</h4>
+      <p style="color: #856404; margin: 0;">You have {{ pending_orders }} pending order{{ pending_orders|pluralize }} waiting for confirmation.</p>
+      <a href="{% url 'seller_orders' %}" class="btn-primary" style="text-decoration: none; margin-top: 1rem; display: inline-block;">View Orders</a>
+    </div>
+    {% endif %}
 
     <!-- Quick Actions -->
     <div style="margin-bottom: 3rem; text-align: center;">
       <h3 style="color: var(--neutral-800); margin-bottom: 2rem;">Quick Actions</h3>
       <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="#" class="btn-primary" style="text-decoration: none;">➕ Add Product</a>
-        <a href="{% url 'product_list' %}" class="btn-secondary" style="text-decoration: none;">📋 View All Products</a>
-        <a href="#" class="btn-secondary" style="text-decoration: none;">📊 Analytics</a>
+        <a href="{% url 'add_product' %}" class="btn-primary" style="text-decoration: none;">➕ Add Product</a>
+        <a href="{% url 'seller_products' %}" class="btn-secondary" style="text-decoration: none;">📋 View My Products</a>
+        <a href="{% url 'seller_orders' %}" class="btn-secondary" style="text-decoration: none;">📦 Manage Orders</a>
       </div>
     </div>
 
@@ -84,6 +94,15 @@
               <div class="sustainability-score">
                 🌱 Eco Score: {{ product.sustainability_score }}/10
               </div>
+              <div style="margin-top: 0.5rem;">
+                {% if product.status == 'approved' %}
+                  <span style="background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">✅ Approved</span>
+                {% elif product.status == 'pending' %}
+                  <span style="background: #fff3cd; color: #856404; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">⏳ Pending Review</span>
+                {% elif product.status == 'rejected' %}
+                  <span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">❌ Rejected</span>
+                {% endif %}
+              </div>
               <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
                 <a href="{% url 'product_detail' product.id %}" class="btn-secondary" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.875rem; padding: 0.5rem;">View</a>
                 <button class="btn-primary" style="padding: 0.5rem; font-size: 0.875rem;">Edit</button>
@@ -100,7 +119,7 @@
           <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
           <h4 style="margin-bottom: 1rem;">No Products Yet</h4>
           <p style="color: var(--neutral-600); margin-bottom: 2rem;">Start by adding your first sustainable product to the marketplace.</p>
-          <a href="#" class="btn-primary" style="text-decoration: none;">Add Your First Product</a>
+          <a href="{% url 'add_product' %}" class="btn-primary" style="text-decoration: none;">Add Your First Product</a>
         </div>
       {% endif %}
     </div>

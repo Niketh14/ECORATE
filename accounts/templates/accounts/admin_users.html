@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Management - EcoRate Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #ffffff; color: #212529; }
+        
+        .admin-sidebar {
+            position: fixed; left: 0; top: 0; width: 250px; height: 100vh;
+            background: #ffffff;
+            color: #212529; z-index: 1000; overflow-y: auto;
+            border-right: 1px solid #dee2e6;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .admin-header { padding: 20px; text-align: center; border-bottom: 1px solid #dee2e6; background: #0066cc; color: white; }
+        .admin-nav { padding: 20px 0; }
+        .admin-nav a {
+            display: block; padding: 12px 20px; color: #495057;
+            text-decoration: none; transition: all 0.3s;
+        }
+        .admin-nav a:hover, .admin-nav a.active { background: #0066cc; color: white; }
+        
+        .admin-main { margin-left: 250px; padding: 20px; min-height: 100vh; background: #f8f9fa; }
+        .admin-topbar {
+            background: white; padding: 15px 20px; border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .admin-card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #dee2e6; }
+        .users-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .users-table th, .users-table td { padding: 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .users-table th { background: #f8f9fa; font-weight: 600; color: #212529; border-bottom: 2px solid #dee2e6; }
+        .users-table tr:hover { background: #f8f9fa; }
+        
+        .user-type-badge {
+            padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 500;
+        }
+        .badge-user { background: #d1ecf1; color: #0066cc; border: 1px solid #bee5eb; }
+        .badge-seller { background: #d4edda; color: #28a745; border: 1px solid #c3e6cb; }
+        .badge-admin { background: #f8d7da; color: #dc3545; border: 1px solid #f5c6cb; }
+        
+        .search-bar { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="admin-sidebar">
+        <div class="admin-header">
+            <h2>🛡️ EcoRate Admin</h2>
+            <p>Control Panel</p>
+        </div>
+        <nav class="admin-nav">
+            <a href="{% url 'admin_home' %}">📊 Dashboard</a>
+            <a href="{% url 'admin_products' %}">📦 Products</a>
+            <a href="{% url 'admin_users' %}" class="active">👥 Users</a>
+            <a href="{% url 'admin_orders' %}">🛒 Orders</a>
+            <a href="{% url 'admin_reviews' %}">⭐ Reviews</a>
+            <a href="{% url 'admin_categories' %}">🏷️ Categories</a>
+            <a href="{% url 'logout' %}">🚪 Logout</a>
+        </nav>
+    </div>
+
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h1>Users Management</h1>
+            <div>{{ users.count }} Users Total</div>
+        </div>
+
+        <div class="admin-card">
+            <h3 style="margin-bottom: 20px;">All Users</h3>
+            <input type="text" class="search-bar" placeholder="🔍 Search users..." id="searchInput">
+            
+            <table class="users-table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>User Type</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td><strong>{{ user.username }}</strong></td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.get_full_name|default:"Not provided" }}</td>
+                        <td>
+                            <span class="user-type-badge badge-{{ user.user_type }}">
+                                {{ user.user_type|title }}
+                            </span>
+                        </td>
+                        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                        <td>
+                            {% if user.is_active %}
+                                <span style="color: #28a745;">✅ Active</span>
+                            {% else %}
+                                <span style="color: #dc3545;">❌ Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</body>
+</html>
