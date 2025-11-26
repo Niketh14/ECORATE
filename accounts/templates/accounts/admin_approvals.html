@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Approvals - EcoRate Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #ffffff; color: #212529; }
+        
+        .admin-sidebar {
+            position: fixed; left: 0; top: 0; width: 250px; height: 100vh;
+            background: #ffffff;
+            color: #212529; z-index: 1000; overflow-y: auto;
+            border-right: 1px solid #dee2e6;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .admin-header { padding: 20px; text-align: center; border-bottom: 1px solid #dee2e6; background: #0066cc; color: white; }
+        .admin-nav { padding: 20px 0; }
+        .admin-nav a {
+            display: block; padding: 12px 20px; color: #495057;
+            text-decoration: none; transition: all 0.3s;
+        }
+        .admin-nav a:hover, .admin-nav a.active { background: #0066cc; color: white; }
+        
+        .admin-main { margin-left: 250px; padding: 20px; min-height: 100vh; background: #f8f9fa; }
+        .admin-topbar {
+            background: white; padding: 15px 20px; border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .admin-card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #dee2e6; }
+        
+        .approval-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .approval-card {
+            border: 2px solid #ffc107; border-radius: 8px; padding: 20px;
+            background: #fffbf0; position: relative;
+        }
+        
+        .product-preview { display: flex; gap: 15px; margin-bottom: 15px; }
+        .product-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .product-details { flex: 1; }
+        
+        .status-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: #ffc107; color: #212529; padding: 5px 10px;
+            border-radius: 4px; font-size: 0.8rem; font-weight: 500;
+        }
+        
+        .cert-preview {
+            margin: 15px 0; text-align: center;
+        }
+        .cert-img { max-width: 100%; height: 150px; object-fit: cover; border-radius: 8px; border: 2px solid #ddd; }
+        
+        .approval-actions {
+            display: flex; gap: 10px; margin-top: 15px;
+        }
+        .btn-approve { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .btn-reject { background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .btn-approve:hover { background: #218838; }
+        .btn-reject:hover { background: #c82333; }
+        
+        .seller-info {
+            background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-sidebar">
+        <div class="admin-header">
+            <h2>🛡️ EcoRate Admin</h2>
+            <p>Control Panel</p>
+        </div>
+        <nav class="admin-nav">
+            <a href="{% url 'admin_home' %}">📊 Dashboard</a>
+            <a href="{% url 'admin_approvals' %}" class="active">⏳ Approvals</a>
+            <a href="{% url 'admin_products' %}">📦 Products</a>
+            <a href="{% url 'admin_users' %}">👥 Users</a>
+            <a href="{% url 'admin_orders' %}">🛒 Orders</a>
+            <a href="{% url 'admin_reviews' %}">⭐ Reviews</a>
+            <a href="{% url 'admin_categories' %}">🏷️ Categories</a>
+            <a href="{% url 'logout' %}">🚪 Logout</a>
+        </nav>
+    </div>
+
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h1>Product Approvals</h1>
+            <div>{{ pending_products.count }} Pending Approval</div>
+        </div>
+
+        {% if pending_products %}
+            <div class="approval-grid">
+                {% for product in pending_products %}
+                <div class="approval-card">
+                    <div class="status-badge">⏳ Pending</div>
+                    
+                    <div class="product-preview">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+                        <div class="product-details">
+                            <h4>{{ product.name }}</h4>
+                            <p><strong>Brand:</strong> {{ product.brand }}</p>
+                            <p><strong>Category:</strong> {{ product.category.name }}</p>
+                            <p><strong>Price:</strong> ${{ product.price }}</p>
+                            <p><strong>Eco Score:</strong> 🌱 {{ product.sustainability_score }}/10</p>
+                        </div>
+                    </div>
+
+                    <div class="seller-info">
+                        <strong>👤 Seller:</strong> {{ product.created_by.username }} ({{ product.created_by.email }})<br>
+                        <strong>📅 Submitted:</strong> {{ product.created_at|date:"M d, Y H:i" }}
+                    </div>
+
+                    <div>
+                        <strong>Description:</strong>
+                        <p style="margin: 5px 0; color: #7f8c8d;">{{ product.description|truncatechars:150 }}</p>
+                    </div>
+
+                    {% if product.eco_certifications %}
+                    <div style="margin: 10px 0;">
+                        <strong>Eco Certifications:</strong> {{ product.eco_certifications }}
+                    </div>
+                    {% endif %}
+
+                    {% if product.eco_certificate_image %}
+                    <div class="cert-preview">
+                        <strong>📜 Certificate Image:</strong><br>
+                        <img src="{{ product.eco_certificate_image.url }}" alt="Certificate" class="cert-img">
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 20px; background: #ffebee; border-radius: 8px; margin: 10px 0;">
+                        <span style="color: #e74c3c;">⚠️ No Certificate Image Provided</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="approval-actions">
+                        <form method="post" action="{% url 'approve_product' product.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn-approve" onclick="return confirm('Are you sure you want to approve this product?')">
+                                ✅ Approve Product
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'approve_product' product.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn-reject" onclick="return confirm('Are you sure you want to reject this product?')">
+                                ❌ Reject Product
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="admin-card" style="text-align: center; padding: 60px;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+                <h3>No Pending Approvals</h3>
+                <p style="color: #7f8c8d; margin-top: 10px;">All products have been reviewed. New submissions will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+
+
+</body>
+</html>

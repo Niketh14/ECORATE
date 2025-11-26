@@ -1,0 +1,75 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}My Orders - EcoRate{% endblock %}
+
+{% block content %}
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'user_orders' %}" class="nav-link active">Orders</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <a href="{% url 'cart' %}" class="nav-link" style="position: relative;">
+        🛒
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 1200px;">
+  <div class="card-body">
+    <h1 style="color: var(--neutral-900); margin-bottom: 2rem;">📦 My Orders</h1>
+    
+    {% if orders %}
+      <div style="display: grid; gap: 1.5rem;">
+        {% for order in orders %}
+        <div class="dashboard-card">
+          <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem;">
+            <div style="flex: 1;">
+              <h4 style="color: var(--neutral-800); margin-bottom: 0.5rem;">Order #{{ order.id }}</h4>
+              <p style="color: var(--neutral-600); margin-bottom: 0.5rem;">{{ order.product.name }} (x{{ order.quantity }})</p>
+              <p style="color: var(--primary-color); font-weight: 600; margin-bottom: 0.5rem;">${{ order.total_price }}</p>
+              <p style="color: var(--neutral-500); font-size: 0.9rem;">Ordered: {{ order.order_date|date:"M d, Y H:i" }}</p>
+              {% if order.confirmed_date %}
+              <p style="color: var(--neutral-500); font-size: 0.9rem;">Stock Confirmed: {{ order.confirmed_date|date:"M d, Y H:i" }}</p>
+              {% endif %}
+              {% if order.shipped_date %}
+              <p style="color: var(--neutral-500); font-size: 0.9rem;">Shipped: {{ order.shipped_date|date:"M d, Y H:i" }}</p>
+              {% endif %}
+            </div>
+            <div style="text-align: right;">
+              <span style="padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+                {% if order.status == 'pending' %}background: #fef3c7; color: #92400e;
+                {% elif order.status == 'confirmed' %}background: #dbeafe; color: #1e40af;
+                {% elif order.status == 'shipped' %}background: #dbeafe; color: #1e40af;
+                {% elif order.status == 'completed' %}background: #d1fae5; color: #065f46;
+                {% else %}background: #fee2e2; color: #991b1b;{% endif %}">
+                {% if order.status == 'pending' %}📋 Order Placed
+                {% elif order.status == 'confirmed' %}✅ Stock Confirmed
+                {% elif order.status == 'shipped' %}🚚 Shipped
+                {% elif order.status == 'completed' %}✅ Delivered
+                {% else %}❌ {{ order.get_status_display }}{% endif %}
+              </span>
+            </div>
+          </div>
+          <img src="{{ order.product.image.url }}" alt="{{ order.product.name }}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="dashboard-card text-center">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+        <h3>No orders yet</h3>
+        <p style="color: var(--neutral-600); margin: 1rem 0;">Start shopping for eco-friendly products!</p>
+        <a href="{% url 'product_list' %}" class="btn-primary" style="text-decoration: none;">Browse Products</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

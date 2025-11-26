@@ -7,19 +7,26 @@
 <!-- Navigation Bar -->
 <nav class="nav-bar">
   <div class="nav-container">
-    <a href="{% url 'user_home' %}" class="nav-brand">
+    <a href="{% url 'landing' %}" class="nav-brand">
       <span style="margin-right: 0.5rem;">🌱</span>EcoRate
     </a>
     <div class="nav-links">
-      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
-      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'landing' %}" class="nav-link">Home</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+        <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      {% else %}
+        <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+        <a href="{% url 'login' %}" class="nav-link">Sign In</a>
+        <a href="{% url 'register' %}" class="nav-link">Register</a>
+      {% endif %}
       <a href="{% url 'about' %}" class="nav-link active">About</a>
       <a href="{% url 'contact' %}" class="nav-link">Contact</a>
       <a href="{% url 'faq' %}" class="nav-link">FAQ</a>
-      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
-      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
       {% if user.is_authenticated %}
-      <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid rgba(255,255,255,0.3);">
+        <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+        <img src="{{ user.profile_pic.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-left: 1rem; border: 2px solid var(--border-color);">
       {% endif %}
     </div>
   </div>
@@ -63,11 +70,56 @@
     </div>
 
     <div class="mb-8">
-      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Our Team</h3>
-      <div class="dashboard-card">
-        <p style="color: var(--neutral-700); line-height: 1.6;">
-          EcoRate was founded by a team of environmental enthusiasts and technology experts who recognized the need for a trusted platform to evaluate sustainable products. Our diverse team combines expertise in environmental science, user experience design, and community building to create a platform that truly serves the needs of eco-conscious consumers.
-        </p>
+      <h3 style="color: var(--primary-color); margin-bottom: 2rem; text-align: center;">Our Team</h3>
+      <p style="color: var(--neutral-700); line-height: 1.6; text-align: center; margin-bottom: 3rem;">
+        EcoRate was founded by a team of environmental enthusiasts and technology experts who recognized the need for a trusted platform to evaluate sustainable products. Our diverse team combines expertise in environmental science, user experience design, and community building to create a platform that truly serves the needs of eco-conscious consumers.
+      </p>
+      
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="team-photo">
+            <img src="https://ui-avatars.com/api/?name=Reshma+Kongarapu&size=200&background=0066cc&color=fff&bold=true" alt="Reshma Kongarapu" class="team-img">
+          </div>
+          <h4 class="team-name">Reshma Kongarapu</h4>
+          <p class="team-role">Developer</p>
+          <p class="team-bio">Full-stack developer passionate about building sustainable technology solutions. Specializes in creating user-friendly interfaces and robust backend systems.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-photo">
+            <img src="https://ui-avatars.com/api/?name=Vani+Srikala+Nimmagadda&size=200&background=0066cc&color=fff&bold=true" alt="Vani Srikala Nimmagadda" class="team-img">
+          </div>
+          <h4 class="team-name">Vani Srikala Nimmagadda</h4>
+          <p class="team-role">Developer</p>
+          <p class="team-bio">Software developer with expertise in web development and database management. Committed to creating efficient and scalable solutions for sustainable living.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-photo">
+            <img src="https://ui-avatars.com/api/?name=Shrinicketh+Karattadipalayam+Sridharan&size=200&background=0066cc&color=fff&bold=true" alt="Shrinicketh Karattadipalayam Sridharan" class="team-img">
+          </div>
+          <h4 class="team-name">Shrinicketh Karattadipalayam Sridharan</h4>
+          <p class="team-role">Developer</p>
+          <p class="team-bio">Full-stack developer focused on building innovative features and improving platform performance. Enthusiastic about leveraging technology for environmental impact.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-photo">
+            <img src="https://ui-avatars.com/api/?name=Aiswarya+Ramachandran&size=200&background=0066cc&color=fff&bold=true" alt="Aiswarya Ramachandran" class="team-img">
+          </div>
+          <h4 class="team-name">Aiswarya Ramachandran</h4>
+          <p class="team-role">Developer</p>
+          <p class="team-bio">Software developer specializing in frontend development and user experience. Dedicated to creating intuitive and accessible interfaces for eco-conscious users.</p>
+        </div>
+        
+        <div class="team-member">
+          <div class="team-photo">
+            <img src="https://ui-avatars.com/api/?name=Sai+Harinath+Reddy+Yelluri&size=200&background=0066cc&color=fff&bold=true" alt="Sai Harinath Reddy Yelluri" class="team-img">
+          </div>
+          <h4 class="team-name">Sai Harinath Reddy Yelluri</h4>
+          <p class="team-role">Developer</p>
+          <p class="team-bio">Backend developer with strong expertise in system architecture and API development. Passionate about building reliable and secure platforms for sustainable product reviews.</p>
+        </div>
       </div>
     </div>
 

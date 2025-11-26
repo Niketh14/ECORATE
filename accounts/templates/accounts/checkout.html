@@ -1,0 +1,245 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Checkout - EcoRate{% endblock %}
+
+{% block content %}
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'cart' %}" class="nav-link">Cart</a>
+      <a href="{% url 'user_orders' %}" class="nav-link">Orders</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 800px;">
+  <div class="card-body">
+    <h1 style="color: var(--neutral-900); margin-bottom: 2rem;">💳 Checkout</h1>
+    
+    <div style="margin-bottom: 2rem;">
+      <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Order Summary</h3>
+      {% for item in cart_items %}
+      <div class="dashboard-card" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+        <div style="flex: 1;">
+          <h4 style="color: var(--neutral-800); margin-bottom: 0.5rem;">{{ item.product.name }}</h4>
+          <p style="color: var(--neutral-600);">{{ item.product.brand }} - Qty: {{ item.quantity }}</p>
+        </div>
+        <p style="color: var(--primary-color); font-weight: 600;">${{ item.total_price }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <div class="dashboard-card" style="margin-bottom: 2rem;">
+      <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Total: ${{ total }}</h3>
+    </div>
+    
+    <form method="post" id="checkout-form">
+      {% csrf_token %}
+      
+      <!-- Payment Method Selection -->
+      <div class="dashboard-card" style="margin-bottom: 2rem;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1.5rem; font-size: 1.3rem; border-bottom: 2px solid #f3f4f6; padding-bottom: 0.5rem;">💳 Select Payment Method</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <label class="payment-option" data-method="card" onclick="selectPayment('card')">
+            <input type="radio" name="payment_method" value="card" checked style="display: none;">
+            <div class="payment-card active">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">💳</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">Card Payment</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Credit/Debit Cards</p>
+            </div>
+          </label>
+          <label class="payment-option" data-method="paypal" onclick="selectPayment('paypal')">
+            <input type="radio" name="payment_method" value="paypal" style="display: none;">
+            <div class="payment-card">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">🅿️</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">PayPal</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Secure & Fast</p>
+            </div>
+          </label>
+          <label class="payment-option" data-method="upi" onclick="selectPayment('upi')">
+            <input type="radio" name="payment_method" value="upi" style="display: none;">
+            <div class="payment-card">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">UPI</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Instant Payment</p>
+            </div>
+          </label>
+          <label class="payment-option" data-method="cod" onclick="selectPayment('cod')">
+            <input type="radio" name="payment_method" value="cod" style="display: none;">
+            <div class="payment-card">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">💵</div>
+              <h4 style="margin: 0; color: var(--neutral-800);">Cash on Delivery</h4>
+              <p style="margin: 0.25rem 0 0 0; color: var(--neutral-600); font-size: 0.85rem;">Pay at Doorstep</p>
+            </div>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Card Payment Details -->
+      <div id="card-details" class="dashboard-card" style="margin-bottom: 2rem;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Card Details</h3>
+        <div style="display: grid; gap: 1rem;">
+          <div>
+            <input type="text" id="card-number" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%; font-size: 16px;" oninput="formatCardNumber(this)">
+            <small style="color: var(--neutral-500);">16-digit card number</small>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;" oninput="formatExpiry(this)">
+              <small style="color: var(--neutral-500);">Valid month/year</small>
+            </div>
+            <div>
+              <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;" oninput="formatCVV(this)">
+              <small style="color: var(--neutral-500);">3-digit CVV</small>
+            </div>
+          </div>
+          <input type="text" name="cardholder_name" placeholder="Cardholder Name" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;">
+        </div>
+      </div>
+      
+      <!-- Other Payment Details -->
+      <div id="paypal-details" class="dashboard-card" style="margin-bottom: 2rem; display: none;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">PayPal Payment</h3>
+        <p style="color: var(--neutral-600);">You will be redirected to PayPal to complete your payment.</p>
+      </div>
+      
+      <div id="upi-details" class="dashboard-card" style="margin-bottom: 2rem; display: none;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">UPI Payment</h3>
+        <input type="text" name="upi_id" placeholder="yourname@upi" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; width: 100%;">
+        <small style="color: var(--neutral-500);">Enter your UPI ID</small>
+      </div>
+      
+      <div id="cod-details" class="dashboard-card" style="margin-bottom: 2rem; display: none;">
+        <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Cash on Delivery</h3>
+        <p style="color: var(--neutral-600);">Pay when your order is delivered. Additional ₹50 COD charges may apply.</p>
+      </div>
+      
+      <div style="text-align: center;">
+        <button type="submit" class="btn-primary" style="font-size: 1.1rem; padding: 15px 30px;">Place Order - ${{ total }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.payment-card {
+  padding: 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.payment-card:hover {
+  border-color: #0066cc;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+}
+
+.payment-card.active {
+  border-color: #0066cc;
+  background: #0066cc;
+  color: white;
+}
+
+.payment-card.active h4,
+.payment-card.active p {
+  color: white;
+}
+</style>
+
+<script>
+function selectPayment(method) {
+  // Remove active class from all payment cards
+  document.querySelectorAll('.payment-card').forEach(card => {
+    card.classList.remove('active');
+  });
+  
+  // Add active class to selected payment card
+  document.querySelector(`[data-method="${method}"] .payment-card`).classList.add('active');
+  
+  // Hide all payment details
+  document.getElementById('card-details').style.display = 'none';
+  document.getElementById('paypal-details').style.display = 'none';
+  document.getElementById('upi-details').style.display = 'none';
+  document.getElementById('cod-details').style.display = 'none';
+  
+  // Show selected payment method details
+  if (method === 'card') {
+    document.getElementById('card-details').style.display = 'block';
+  } else if (method === 'paypal') {
+    document.getElementById('paypal-details').style.display = 'block';
+  } else if (method === 'upi') {
+    document.getElementById('upi-details').style.display = 'block';
+  } else if (method === 'cod') {
+    document.getElementById('cod-details').style.display = 'block';
+  }
+}
+
+function formatCardNumber(input) {
+  let value = input.value.replace(/\D/g, '');
+  value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+  input.value = value;
+}
+
+function formatExpiry(input) {
+  let value = input.value.replace(/\D/g, '');
+  if (value.length >= 2) {
+    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+  }
+  input.value = value;
+}
+
+function formatCVV(input) {
+  input.value = input.value.replace(/\D/g, '');
+}
+
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+  const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+  
+  if (paymentMethod === 'card') {
+    const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+    const expiry = document.getElementById('expiry').value;
+    const cvv = document.getElementById('cvv').value;
+    
+    if (cardNumber.length !== 16) {
+      alert('Please enter a valid 16-digit card number');
+      e.preventDefault();
+      return;
+    }
+    
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      alert('Please enter a valid expiry date (MM/YY)');
+      e.preventDefault();
+      return;
+    }
+    
+    if (cvv.length !== 3) {
+      alert('Please enter a valid 3-digit CVV');
+      e.preventDefault();
+      return;
+    }
+    
+    const [month, year] = expiry.split('/');
+    const currentDate = new Date();
+    const expiryDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
+    
+    if (expiryDate <= currentDate) {
+      alert('Card has expired. Please use a valid card.');
+      e.preventDefault();
+      return;
+    }
+  }
+});
+</script>
+{% endblock %}

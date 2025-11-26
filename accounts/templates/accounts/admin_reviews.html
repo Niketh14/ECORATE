@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews Management - EcoRate Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #ffffff; color: #212529; }
+        
+        .admin-sidebar {
+            position: fixed; left: 0; top: 0; width: 250px; height: 100vh;
+            background: #ffffff;
+            color: #212529; z-index: 1000; overflow-y: auto;
+            border-right: 1px solid #dee2e6;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .admin-header { padding: 20px; text-align: center; border-bottom: 1px solid #dee2e6; background: #0066cc; color: white; }
+        .admin-nav { padding: 20px 0; }
+        .admin-nav a {
+            display: block; padding: 12px 20px; color: #495057;
+            text-decoration: none; transition: all 0.3s;
+        }
+        .admin-nav a:hover, .admin-nav a.active { background: #0066cc; color: white; }
+        
+        .admin-main { margin-left: 250px; padding: 20px; min-height: 100vh; background: #f8f9fa; }
+        .admin-topbar {
+            background: white; padding: 15px 20px; border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .admin-card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #dee2e6; }
+        .reviews-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .reviews-table th, .reviews-table td { padding: 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .reviews-table th { background: #f8f9fa; font-weight: 600; color: #212529; border-bottom: 2px solid #dee2e6; }
+        .reviews-table tr:hover { background: #f8f9fa; }
+        
+        .rating-stars { color: #ffc107; }
+        .review-img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+        .search-bar { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="admin-sidebar">
+        <div class="admin-header">
+            <h2>🛡️ EcoRate Admin</h2>
+            <p>Control Panel</p>
+        </div>
+        <nav class="admin-nav">
+            <a href="{% url 'admin_home' %}">📊 Dashboard</a>
+            <a href="{% url 'admin_products' %}">📦 Products</a>
+            <a href="{% url 'admin_users' %}">👥 Users</a>
+            <a href="{% url 'admin_orders' %}">🛒 Orders</a>
+            <a href="{% url 'admin_reviews' %}" class="active">⭐ Reviews</a>
+            <a href="{% url 'admin_categories' %}">🏷️ Categories</a>
+            <a href="{% url 'logout' %}">🚪 Logout</a>
+        </nav>
+    </div>
+
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h1>Reviews Management</h1>
+            <div>{{ reviews.count }} Reviews Total</div>
+        </div>
+
+        <div class="admin-card">
+            <h3 style="margin-bottom: 20px;">All Reviews</h3>
+            <input type="text" class="search-bar" placeholder="🔍 Search reviews..." id="searchInput">
+            
+            <table class="reviews-table" id="reviewsTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>User</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Image</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td><strong>{{ review.product.name }}</strong></td>
+                        <td>{{ review.user.username }}</td>
+                        <td>
+                            <span class="rating-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}⭐{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                        </td>
+                        <td>{{ review.comment|truncatechars:50 }}</td>
+                        <td>
+                            {% if review.image %}
+                                <img src="{{ review.image.url }}" class="review-img" alt="Review image">
+                            {% else %}
+                                <span style="color: #7f8c8d;">No image</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ review.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</body>
+</html>

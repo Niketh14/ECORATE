@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Management - EcoRate Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #ffffff; color: #212529; }
+        
+        .admin-sidebar {
+            position: fixed; left: 0; top: 0; width: 250px; height: 100vh;
+            background: #ffffff;
+            color: #212529; z-index: 1000; overflow-y: auto;
+            border-right: 1px solid #dee2e6;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .admin-header {
+            padding: 20px; text-align: center; border-bottom: 1px solid #dee2e6;
+            background: #0066cc;
+            color: white;
+        }
+        
+        .admin-nav { padding: 20px 0; }
+        .admin-nav a {
+            display: block; padding: 12px 20px; color: #495057;
+            text-decoration: none; transition: all 0.3s;
+        }
+        .admin-nav a:hover, .admin-nav a.active {
+            background: #0066cc; color: white;
+        }
+        
+        .admin-main {
+            margin-left: 250px; padding: 20px; min-height: 100vh;
+            background: #f8f9fa;
+        }
+        
+        .admin-topbar {
+            background: white; padding: 15px 20px; border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .admin-card {
+            background: white; border-radius: 8px; padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .products-table {
+            width: 100%; border-collapse: collapse; margin-top: 20px;
+        }
+        
+        .products-table th, .products-table td {
+            padding: 15px; text-align: left; border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .products-table th {
+            background: #f8f9fa; font-weight: 600; color: #212529;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .products-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .product-img {
+            width: 60px; height: 60px; object-fit: cover; border-radius: 8px;
+        }
+        
+        .btn-view {
+            background: #0066cc; color: white; padding: 5px 10px;
+            border: none; border-radius: 4px; text-decoration: none;
+            font-size: 0.8rem; margin-right: 5px;
+            transition: background 0.2s;
+        }
+        .btn-view:hover {
+            background: #0052a3;
+        }
+        
+        .btn-cert {
+            background: #28a745; color: white; padding: 5px 10px;
+            border: none; border-radius: 4px; text-decoration: none;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        .btn-cert:hover {
+            background: #218838;
+        }
+        
+        .eco-badge {
+            background: #d4edda; color: #28a745; padding: 3px 8px;
+            border-radius: 4px; font-size: 0.8rem;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .seller-info {
+            font-size: 0.9rem; color: #7f8c8d;
+        }
+        
+        .search-bar {
+            width: 100%; padding: 10px; border: 1px solid #ddd;
+            border-radius: 8px; margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <div class="admin-header">
+            <h2>🛡️ EcoRate Admin</h2>
+            <p>Control Panel</p>
+        </div>
+        <nav class="admin-nav">
+            <a href="{% url 'admin_home' %}">📊 Dashboard</a>
+            <a href="{% url 'admin_products' %}" class="active">📦 Products</a>
+            <a href="{% url 'admin_users' %}">👥 Users</a>
+            <a href="{% url 'admin_orders' %}">🛒 Orders</a>
+            <a href="{% url 'admin_reviews' %}">⭐ Reviews</a>
+            <a href="{% url 'admin_categories' %}">🏷️ Categories</a>
+            <a href="{% url 'logout' %}">🚪 Logout</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h1>Products Management</h1>
+            <div>{{ products.count }} Products Total</div>
+        </div>
+
+        <div class="admin-card">
+            <h3 style="margin-bottom: 20px;">All Products & Certificates</h3>
+            
+            <input type="text" class="search-bar" placeholder="🔍 Search products, sellers, or brands..." id="searchInput">
+            
+            <table class="products-table" id="productsTable">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product Details</th>
+                        <th>Seller</th>
+                        <th>Price</th>
+                        <th>Eco Score</th>
+                        <th>Certificate</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+                        </td>
+                        <td>
+                            <strong>{{ product.name }}</strong><br>
+                            <span style="color: #7f8c8d;">{{ product.brand }}</span><br>
+                            <small>{{ product.category.name }}</small>
+                        </td>
+                        <td>
+                            <div class="seller-info">
+                                <strong>{{ product.created_by.username }}</strong><br>
+                                <small>{{ product.created_by.email }}</small><br>
+                                <small>{{ product.created_by.user_type|title }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>${{ product.price }}</strong>
+                        </td>
+                        <td>
+                            <span class="eco-badge">🌱 {{ product.sustainability_score }}/10</span>
+                        </td>
+                        <td>
+                            {% if product.eco_certificate_image %}
+                                <a href="{{ product.eco_certificate_image.url }}" target="_blank" class="btn-cert">View Cert</a>
+                            {% else %}
+                                <span style="color: #e74c3c;">No Certificate</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'product_detail' product.id %}" class="btn-view">View</a>
+                            <button class="btn-cert" onclick="viewProduct({{ product.id }})">Details</button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">📦</div>
+                            <p>No products found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</body>
+</html>

@@ -1,18 +1,21 @@
 # forms.py - Updated
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import CustomUser, Review
+from .models import CustomUser, Review, Product, Category
 
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    user_type = forms.ChoiceField(
+        choices=[('user', 'Registered User'), ('seller', 'Registered Seller')],
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'password1', 'password2', 'user_type']
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'user_type': forms.Select(attrs={'class': 'form-control'}),
         }
 
 
@@ -71,4 +74,23 @@ class ReviewForm(forms.ModelForm):
         widgets = {
             'rating': forms.Select(attrs={'class': 'form-control'}),
             'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Share your experience with this product...'}),
+        }
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'category', 'brand', 'price', 'sustainability_score', 'eco_certifications', 'image', 'eco_certificate_image']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'brand': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'sustainability_score': forms.NumberInput(attrs={'class': 'form-control', 'min': '1', 'max': '10'}),
+            'eco_certifications': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+            'eco_certificate_image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+        }
+        labels = {
+            'eco_certificate_image': 'Eco Certificate Image',
         }

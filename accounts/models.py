@@ -41,6 +41,12 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
     name = models.CharField(max_length=200)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -49,11 +55,23 @@ class Product(models.Model):
     sustainability_score = models.IntegerField(default=0, help_text="1-10 scale")
     eco_certifications = models.CharField(max_length=200, blank=True)
     image = models.ImageField(upload_to='products/', default='products/default.jpg')
+    eco_certificate_image = models.ImageField(upload_to='eco_certificates/', blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    approved_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='additional_images')
+    image = models.ImageField(upload_to='products/additional/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.product.name} - Image {self.id}"
 
 
 class Review(models.Model):
@@ -101,3 +119,68 @@ class UserHistory(models.Model):
 
     def __str__(self):
         return f"{self.user.username} viewed {self.product.name}"
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'product']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name} (x{self.quantity})"
+
+    @property
+    def total_price(self):
+        return self.product.price * self.quantity
+
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Stock Confirmed'),
+        ('shipped', 'Shipped'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='orders')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    seller = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='seller_orders')
+    quantity = models.PositiveIntegerField(default=1)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    stock_confirmed = models.BooleanField(default=False)
+    order_date = models.DateTimeField(auto_now_add=True)
+    confirmed_date = models.DateTimeField(null=True, blank=True)
+    shipped_date = models.DateTimeField(null=True, blank=True)
+    completed_date = models.DateTimeField(null=True, blank=True)
+    
+    # Guest order fields (for unregistered users)
+    guest_name = models.CharField(max_length=200, blank=True, default='')
+    guest_email = models.EmailField(blank=True, default='')
+    guest_phone = models.CharField(max_length=15, blank=True, default='')
+    guest_address = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        if self.user:
+            return f"Order #{self.id} - {self.user.username} - {self.product.name}"
+        else:
+            return f"Order #{self.id} - Guest ({self.guest_email}) - {self.product.name}"
+    
+    @property
+    def customer_name(self):
+        """Return customer name - either user's name or guest name"""
+        if self.user:
+            return self.user.get_full_name() or self.user.username
+        return self.guest_name
+    
+    @property
+    def customer_email(self):
+        """Return customer email - either user's email or guest email"""
+        if self.user:
+            return self.user.email
+        return self.guest_email

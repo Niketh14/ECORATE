@@ -1,0 +1,67 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Shopping Cart - EcoRate{% endblock %}
+
+{% block content %}
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'user_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'user_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'product_list' %}" class="nav-link">Products</a>
+      <a href="{% url 'user_orders' %}" class="nav-link">Orders</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+      <a href="{% url 'cart' %}" class="nav-link active" style="position: relative;">
+        🛒
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="card" style="width: 95%; max-width: 1000px;">
+  <div class="card-body">
+    <h1 style="color: var(--neutral-900); margin-bottom: 2rem;">🛒 Shopping Cart</h1>
+    
+    {% if cart_items %}
+      <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+        {% for item in cart_items %}
+        <div class="dashboard-card">
+          <div style="display: grid; grid-template-columns: 100px 1fr auto auto; gap: 1rem; align-items: center;">
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+            <div>
+              <h4 style="color: var(--neutral-800); margin: 0 0 0.5rem 0;">{{ item.product.name }}</h4>
+              <p style="color: var(--neutral-600); margin: 0 0 0.5rem 0; font-size: 0.9rem;">{{ item.product.brand }}</p>
+              <p style="color: var(--neutral-500); margin: 0; font-size: 0.85rem;">Unit Price: ${{ item.product.price }}</p>
+            </div>
+            <div style="text-align: center;">
+              <p style="color: var(--neutral-600); margin: 0 0 0.25rem 0; font-size: 0.85rem;">Quantity</p>
+              <p style="color: var(--neutral-800); font-weight: 600; margin: 0; font-size: 1.1rem;">{{ item.quantity }}</p>
+            </div>
+            <div style="text-align: right;">
+              <p style="color: var(--primary-color); font-weight: 700; margin: 0 0 1rem 0; font-size: 1.2rem;">${{ item.total_price }}</p>
+              <a href="{% url 'remove_from_cart' item.id %}" class="btn-secondary" style="text-decoration: none; font-size: 0.85rem; padding: 0.4rem 0.8rem;">Remove</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      
+      <div class="dashboard-card" style="background: var(--primary-color); color: white; text-align: center;">
+        <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem;">Cart Total: ${{ total }}</h3>
+        <a href="{% url 'checkout' %}" class="btn-primary" style="text-decoration: none; background: white; color: var(--primary-color); font-weight: 600;">Proceed to Checkout</a>
+      </div>
+    {% else %}
+      <div class="dashboard-card text-center">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🛒</div>
+        <h3>Your cart is empty</h3>
+        <p style="color: var(--neutral-600); margin: 1rem 0;">Add some eco-friendly products to get started!</p>
+        <a href="{% url 'product_list' %}" class="btn-primary" style="text-decoration: none;">Browse Products</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

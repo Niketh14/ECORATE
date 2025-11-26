@@ -30,7 +30,12 @@
 
         <div class="mb-6">
           <label class="form-label" for="id_password">Password</label>
-          {{ form.password }}
+          <div class="password-wrapper">
+            {{ form.password }}
+            <button type="button" class="password-toggle" onclick="togglePassword('id_password', this)" aria-label="Toggle password visibility">
+              Show
+            </button>
+          </div>
           {% if form.password.errors %}
             <ul class="errorlist">
               {% for error in form.password.errors %}
@@ -56,4 +61,19 @@
     </div>
   </div>
 </div>
+
+<script>
+function togglePassword(inputId, button) {
+  const passwordInput = document.getElementById(inputId);
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    button.textContent = 'Hide';
+    button.setAttribute('aria-label', 'Hide password');
+  } else {
+    passwordInput.type = 'password';
+    button.textContent = 'Show';
+    button.setAttribute('aria-label', 'Show password');
+  }
+}
+</script>
 {% endblock %}

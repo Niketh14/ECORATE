@@ -1,0 +1,132 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}Add Product - EcoRate{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <a href="{% url 'seller_home' %}" class="nav-brand">
+      <span style="margin-right: 0.5rem;">🌱</span>EcoRate Seller
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'seller_home' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'seller_products' %}" class="nav-link">My Products</a>
+      <a href="{% url 'add_product' %}" class="nav-link active">Add Product</a>
+      <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+      <a href="{% url 'logout' %}" class="nav-link">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Add New Product</h2>
+    <p style="margin: 0.5rem 0 0 0; color: rgba(255, 255, 255, 0.9);">List your sustainable product</p>
+  </div>
+
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="{{ form.name.id_for_label }}">Product Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}
+            <div class="error-message">{{ form.name.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.brand.id_for_label }}">Brand</label>
+          {{ form.brand }}
+          {% if form.brand.errors %}
+            <div class="error-message">{{ form.brand.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Description</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="error-message">{{ form.description.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="{{ form.category.id_for_label }}">Category</label>
+          {{ form.category }}
+          <div style="margin-top: 10px;">
+            <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">Or create a new category:</p>
+            <input type="text" name="custom_category_name" class="form-control" placeholder="New category name (optional)" style="margin-bottom: 5px;">
+            <textarea name="custom_category_desc" class="form-control" placeholder="Category description (optional)" rows="2"></textarea>
+            <small style="color: #666;">Leave blank to use existing category above</small>
+          </div>
+          {% if form.category.errors %}
+            <div class="error-message">{{ form.category.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.price.id_for_label }}">Price ($)</label>
+          {{ form.price }}
+          {% if form.price.errors %}
+            <div class="error-message">{{ form.price.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="{{ form.sustainability_score.id_for_label }}">Sustainability Score (1-10)</label>
+          {{ form.sustainability_score }}
+          {% if form.sustainability_score.errors %}
+            <div class="error-message">{{ form.sustainability_score.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.eco_certifications.id_for_label }}">Eco Certifications</label>
+          {{ form.eco_certifications }}
+          {% if form.eco_certifications.errors %}
+            <div class="error-message">{{ form.eco_certifications.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.image.id_for_label }}">Main Product Image</label>
+        {{ form.image }}
+        {% if form.image.errors %}
+          <div class="error-message">{{ form.image.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="additional_images">Additional Product Images</label>
+        <input type="file" name="additional_images" class="form-control" multiple accept="image/*">
+        <small class="form-text text-muted">You can select multiple images (optional)</small>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.eco_certificate_image.id_for_label }}">Eco Certificate Image</label>
+        {{ form.eco_certificate_image }}
+        <small class="form-text text-muted">Upload an image of your eco certification (optional)</small>
+        {% if form.eco_certificate_image.errors %}
+          <div class="error-message">{{ form.eco_certificate_image.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <button type="submit" class="btn-primary">Add Product</button>
+        <a href="{% url 'seller_home' %}" class="btn-secondary" style="text-decoration: none;">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
